@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加业务员</title>
+    <link rel="stylesheet" href="/static/lib/layui-v2.5.5/css/layui.css">
+    <script src="/static/lib/layui-v2.5.5/layui.js"></script>
+</head>
+<body>
+<form action="/add_saleman/" method="post">
+    <table style='align-content: center' class="layui-table">
+        <tr>
+            <th colspan="2">
+                <button class="layui-btn" style="margin-left:1%" type="submit">保存</button>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                业务员id：
+            </th>
+            <th>
+                <label>
+                    <input type="text" name="saleman_id" class="layui-input" value="{{ saleman_id }}" readonly>
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                业务员姓名：
+            </th>
+            <th>
+                <label>
+                    <input type="text" name="saleman_name" class="layui-input" value="{{ search_saleman.name }}">
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                业务员负责区域：
+            </th>
+            <th>
+                <label>
+                    <select name="territory" id="" class="layui-select">
+                        {% for foo in all_territory %}
+                            {% if search_saleman.territory == foo.territory %}
+                                <option name="territory" selected> {{ foo.territory }}</option>
+                            {% else %}
+                                <option name="territory"> {{ foo.territory }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                业务员上级：
+            </th>
+            <th>
+                <label>
+                    <select name="superiorname" id="" class="layui-select">
+                        {% for foo in all_superiorname %}
+                            {% if search_saleman.superiorname == foo.superiorname %}
+                                <option name="superiorname" selected> {{ foo.superiorname }}</option>
+                            {% else %}
+                                <option name="superiorname"> {{ foo.superiorname }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                业务员权限：
+            </th>
+            <th>
+                <label>
+                    <input type="text" name="saleman_level" class="layui-input" value="{{ search_saleman.level }}">
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                出生日期：
+            </th>
+            <th>
+                <label>
+                    <input type="date" name="birthday" class="layui-input" style="width: 200px"
+                           value=None>
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                入职日期：
+            </th>
+            <th>
+                <label>
+                    <input type="date" name="hiredate" class="layui-input" style="width: 200px"
+                           value=None>
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                离职日期：
+            </th>
+            <th>
+                <label>
+                    <input type="date" name="resignation_time" class="layui-input" style="width: 200px"
+                           value=None>
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                家庭住址：
+            </th>
+            <th>
+                <label>
+                    <input type="text" name="home_address" class="layui-input"
+                           value=None>
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                薪资：
+            </th>
+            <th>
+                <label>
+                    <input type="text" name="salary" class="layui-input"
+                           value=None>
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                备注：
+            </th>
+            <th>
+                <label>
+                    <input type="text" name="remake" class="layui-input"
+                           value=None>
+                </label>
+            </th>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

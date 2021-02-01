@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>客户信息修改</title>
+    <link rel="stylesheet" href="/static/lib/layui-v2.5.5/css/layui.css">
+    <script src="/static/lib/layui-v2.5.5/layui.js"></script>
+</head>
+<body>
+<form action="/add_customer/" method="POST">
+    <div>
+        <div class="login-con">
+            <div>
+                <table class="layui-table">
+                    <tr>
+                        <th colspan="6" style="font-size: x-large">
+                            添加客户
+                            <label>
+                            </label>
+                        </th>
+                        <th>
+                            <input class="layui-btn" type="submit" value="保存">
+                        </th>
+                    </tr>
+                    <tr hight="300px">
+                        <td colspan="2" align="center"> 所属大区:</td>
+                        <td colspan="2"><label>
+                            <input type="text" name="area" list="areas" class="layui-input"
+                                   value="{{ customer_info.area }}">
+                            <datalist id="areas" style="display:none; ">
+                                {% for foo in search_all_area %}
+                                    <option name="area"> {{ foo.area }}</option>
+                                {% endfor %}
+                            </datalist>
+                        </label>
+                        </td>
+                        <td colspan="2" align="center"> 业务人员:</td>
+                        <td colspan="1">
+                            <label>
+                                <input type="text" name="saleman" list="salemans" class="layui-input"
+                                       value="{{ customer_info.saleman }}">
+                                <datalist id="salemans" style="display:none; ">
+                                    {% for foo in search_all_saleman %}
+                                        <option name="saleman"> {{ foo.saleman }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </label></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">客户基本情况</td>
+                        <td hight="300px" width="200px">客户公司名称</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="customer"/>
+                        </label></td>
+                        <td>联系人</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="linkman"
+                            >
+                        </label></td>
+                        <td>联系电话</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="phone_number"
+                            >
+                        </label></td>
+                    </tr>
+                    <tr>
+                        <td>客户公司地址</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="company_address"
+                            >
+                        </label></td>
+                        <td>客户公司人数</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="number_of_employee"
+                            >
+                        </label></td>
+                        <td>实际老板及电话</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="real_boss_and_phone"
+                            >
+                        </label></td>
+                    </tr>
+                    <tr>
+                        <td>老板生日</td>
+                        <td><label>
+                            <input class="layui-input" type="date" name="boss_birthday"
+                                   value="">
+                        </label></td>
+                        <td>老板生肖</td>
+                        <td><label>
+                            <input type="text" name="boss_chinese_zodiac" list="boss_chinese_zodiacs"
+                                   class="layui-input"
+                                   value="{{ customer_info.boss_chinese_zodiac }}">
+                            <datalist id="boss_chinese_zodiacs" style="display:none; ">
+                                {% for foo in search_boss_chinese_zodiac %}
+                                    <option name="boss_chinese_zodiac"> {{ foo.boss_chinese_zodiac }}</option>
+                                {% endfor %}
+                            </datalist>
+                        </label></td>
+                        <td>店庆日</td>
+                        <td><label>
+                            <input class="layui-input" type="date" name="company_birthday"
+                                   autocomplete="off"
+                                   value="">
+                        </label></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">公司经营产品</td>
+                        <td>所售产品是否全部是侨宝品牌</td>
+                        <td>
+                            <label>
+                                <input type="text" name="sale_product_all_is_qb" list="sale_product_all_is_qbs"
+                                       class="layui-input"
+                                       value="{{ customer_info.sale_product_all_is_qb }}">
+                                <datalist id="sale_product_all_is_qbs" style="display:none; ">
+                                    {% for foo in search_sale_product_all_is_qb %}
+                                        <option name="sale_product_all_is_qb"> {{ foo.sale_product_all_is_qb }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </label>
+                        </td>
+                        <td>在售其他品牌名称</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="other_product_name"
+                            >
+                        </label></td>
+                        <td>全年度销售所有产品总额</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="total_annual_sales"
+                            >
+                        </label></td>
+                    </tr>
+                    <tr>
+
+                        <td>侨宝产品占比</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="Products_accounted_for_qb"
+                            >
+                        </label></td>
+                        <td>侨宝陈皮占比</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="Products_accounted_for_chenpi"
+                            >
+                        </label></td>
+
+                        <td>侨宝柑普茶占比</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="Products_accounted_for_ganpucha"
+                            >
+                        </label></td>
+
+                    </tr>
+                    <tr>
+                        <td rowspan="2">与侨宝签约情况</td>
+                        <td>所负责区域</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="area_responsible"
+                            >
+                        </label></td>
+
+                        <td>经销商类别</td>
+                        <td><label>
+                            <input type="text" name="customer_level" list="customer_levels"
+                                   class="layui-input"
+                                   value="{{ customer_info.customer_level }}">
+                            <datalist id="customer_levels" style="display:none; ">
+                                {% for foo in search_customer_level %}
+                                    <option name="customer_level"> {{ foo.customer_level }}</option>
+                                {% endfor %}
+                            </datalist>
+                        </label></td>
+
+                        <td>2020年度总任务</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="task_money"
+                            >
+                        </label></td>
+
+                    </tr>
+                    <tr>
+                        <td>2020年已完成</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="finish_money"
+                            >
+                        </label></td>
+
+                        <td>2020年七月果进货额</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="purchase_amount_of_qiyueguo"
+                            >
+                        </label></td>
+
+                        <td>2020年新皮存储金额</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="the_storage_amount_of_xinpi"
+                            >
+                        </label></td>
+
+                    </tr>
+                    <tr>
+                        <td>侨宝产品销售前三名</td>
+                        <td>1</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="the_qbproduct_sales_first"
+                            >
+                        </label></td>
+                        <td>2</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="the_qbproduct_sales_second"
+                            >
+                        </label></td>
+                        <td>3</td>
+                        <td><label>
+                            <input class="layui-input" type="text" name="the_qbproduct_sales_third"
+                            >
+                        </label></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">网点情况</td>
+                        <td rowspan="2">列出名下分销、网点、专柜情况</td>
+                        <td>分销(现有数量及名称)</td>
+                        <td colspan="4"><label>
+                            <input class="layui-input" type="text" name="fenxiao_number_name"
+                            >
+                        </label></td>
+                    </tr>
+                    <tr>
+                        <td> 专柜(现有数量及名称)</td>
+                        <td colspan="4"><label>
+                            <input class="layui-input" type="text" name="zhuangui_number_name"
+                            >
+                        </label></td>
+                    </tr>
+                    <tr>
+                        <td>客户情况说明</td>
+                        <td>客户情况具体说明(不少于三条)</td>
+                        <td colspan="5"><label>
+                            <input class="layui-input" type="text" name="customer_specific_circumstance"
+                            >
+                        </label></td>
+                    </tr>
+                    <tr>
+                        <td>问题</td>
+                        <td>2020年度经销商遇到的问题及解决方式</td>
+                        <td colspan="5"><label>
+                            <input class="layui-input" type="text" name="question"
+                            >
+                        </label></td>
+                    </tr>
+                    <tr>
+                        <td>备注</td>
+                        <td colspan="5"><label>
+                            <input class="layui-input" type="text" name="remark"
+                            >
+                        </label></td>
+                        <td>
+                            <label>
+                                <input class="layui-input" type="text" name="customer_id" width="0"
+                                >
+                            </label>
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+</body>
+</html>
+

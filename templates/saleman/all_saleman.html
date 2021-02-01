@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看业务员</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script src="../../static/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="../../static/lib/layui-v2.5.5/css/layui.css" media="all">
+    <script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/bootstrap-table-expandable.css">
+    <script src="../../static/js/bootstrap-table-expandable.js"></script>
+</head>
+<body>
+<form action="/all_saleman/" method="post">
+    <div class="demoTable">
+        区域
+        <label class="layui-inline">
+            <input type="text" name="territory" list="areas" class="layui-input" autocomplete="off">
+        </label>
+        <!-- 使用style="display:none;"将datalist元素设定为不显示 -->
+        <datalist id="areas" style="display:none;" id="demoReload">
+            {% for cus in search_territory %}
+                <option name='territory'>{{ cus.territory }}</option>
+            {% endfor %}
+        </datalist>
+        <button type="submit" class="layui-btn">搜索
+        </button>
+    </div>
+</form>
+<div>
+    <table class="layui-hide" id="demo" lay-filter="user"></table>
+</div>
+<script>
+    layui.use('table', function () {
+        var table = layui.table;
+        //展示已知数据
+        table.render({
+            elem: '#demo'
+            , defaultToolbar: ['filter', 'exports', 'print']
+            , toolbar: '#toolbarDemo'
+            , cols: [[ //标题栏
+
+
+                {field: 'id', title: 'ID', width: 80, sort: true}
+                , {field: 'name', title: '姓名', width: 120, templet: addLink}
+                , {field: 'territory', title: '负责区域', minWidth: 150}
+                , {field: 'superiorname', title: '上级', minWidth: 150}
+                , {field: 'home_address', title: '住址', minWidth: 150}
+                , {field: 'right', title: '操作', toolbar: '#saleman_tool', width: 150}
+            ]],
+            data: [
+                {% for foo in all_search_saleman %}
+                    {
+                        "id": "{{foo.id}}"
+                        , "name": "{{foo.name}}"
+                        , "territory": "{{foo.territory}}"
+                        , "superiorname": "{{foo.superiorname}}"
+                        , "home_address": "{{ foo.home_address }}"
+                    },
+                {% endfor %}
+            ],
+            page: true,
+        })
+        ;
+        table.on('tool(user)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        url: "/delete_saleman/",
+                        type: "POST",
+                        data: {id: data.id},
+                        success: function (msg) {
+                            if (msg === 200) {
+                                //删除这一行
+                                obj.del();
+                                //关闭弹框
+                                layer.close(index);
+                                layer.msg("删除成功", {icon: 6});
+                            } else {
+                                obj.del();
+                                //关闭弹框
+                                layer.close(index);
+                                layer.msg("删除成功", {icon: 6});
+                            }
+                        }
+                    });
+                    return false;
+                });
+            } else if (obj.event === 'edit') {
+                layer.open({
+                    type: 2,
+                    data: {id: data.id},
+                    title: '业务员信息编辑',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    area: ['80%', '80%'],
+                    content: '/edit_saleman/?id=' + data.id
+                });
+            }
+        });
+    });
+</script>
+<script>
+    function addLink(d) {
+        var addLink = d.name;
+        var href_link = '/saleman_welcome/?saleman_id =' + d.name
+        if ('' === addLink || null == addLink) {
+            return '';
+        }
+        if (addLink.length > 0) {
+            return "<a class='layui-table-link' href='/saleman_welcome/?saleman_name=" + d.name + "' lay-event='link'>" + d.name + '</a>';
+        }
+    }
+</script>
+<script type="text/html" id="saleman_tool">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="edit">编辑</button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete">删除</button>
+    </div>
+</script>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData"></button>
+    </div>
+</script>
+</body>
+
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看客户</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script src="../../static/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="../../static/lib/layui-v2.5.5/css/layui.css" media="all">
+    <script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/bootstrap-table-expandable.css">
+    <script src="../../static/js/bootstrap-table-expandable.js"></script>
+</head>
+<body>
+<form action="/all_customer/" method="post">
+    <div style="margin-top: 20px">
+        <label class="layui-inline">
+            客户公司名称:
+            <input type="text" name="customer" list="customers" class="layui-input">
+        </label>
+        <!-- 使用style="display:none;"将datalist元素设定为不显示 -->
+        <datalist id="customers" style="display:none;">
+            {% for cus in search_all_customer %}
+                <option name='customer'>{{ cus.customer }}</option>
+            {% endfor %}
+        </datalist>
+        <label class="layui-inline">
+            经销商类别:
+            <input type="text" name="level" list="levels" class="layui-input">
+        </label>
+        <!-- 使用style="display:none;"将datalist元素设定为不显示 -->
+        <datalist id="levels" style="display:none; ">
+            {% for level in search_customer_level %}
+                <option name='level'>{{ level.customer_level }}</option>
+            {% endfor %}
+        </datalist>
+        <label class="layui-inline">
+            业务人员:
+            <input type="text" name="saleman" list="salemans" class="layui-input">
+        </label>
+        <!-- 使用style="display:none;"将datalist元素设定为不显示 -->
+        <datalist id="salemans" style="display:none; ">
+            {% for saleman in search_all_saleman %}
+                <option name='saleman'>{{ saleman.saleman }}</option>
+            {% endfor %}
+        </datalist>
+        <label class="layui-inline">
+            所属大区:
+            <input type="text" name="area" list="areas" class="layui-input">
+        </label>
+        <!-- 使用style="display:none;"将datalist元素设定为不显示 -->
+        <datalist id="areas" style="display:none; ">
+            {% for area in search_all_area %}
+                <option name='area'>{{ area.area }}</option>
+            {% endfor %}
+        </datalist>
+        <label class="layui-inline">
+            老板生日:
+            <input type="text" name="boss_birthday" list="boss_birthdays" class="layui-input">
+        </label>
+        <!-- 使用style="display:none;"将datalist元素设定为不显示 -->
+        <datalist id="boss_birthdays" style="display:none; ">
+            {% for birthday in boss_birthday_list %}
+                <option name='boss_birthday'>{{ birthday }}</option>
+            {% endfor %}
+        </datalist>
+        <label class="layui-inline">
+            老板生肖:
+            <input type="text" name="ShengXiao" list="ShengXiaos" class="layui-input">
+        </label>
+        <!-- 使用style="display:none;"将datalist元素设定为不显示 -->
+        <datalist id="ShengXiaos" style="display:none; ">
+            {% for ShengXiao in search_boss_chinese_zodiac %}
+                <option name='ShengXiao'>{{ ShengXiao.boss_chinese_zodiac }}</option>
+            {% endfor %}
+        </datalist>
+        <label class="layui-inline">
+            店庆日:
+            <input type="text" name="company_birthday" list="company_birthdays" class="layui-input">
+        </label>
+        <!-- 使用style="display:none;"将datalist元素设定为不显示 -->
+        <datalist id="company_birthdays" style="display:none; ">
+            {% for company_birthday in boss_birthday_list %}
+                <option name='company_birthday'>{{ company_birthday }}</option>
+            {% endfor %}
+        </datalist>
+
+        <button type="submit" style="font-size:large ; margin-top: 20px" class="layui-btn">搜索</button>
+    </div>
+</form>
+<div>
+    <table class="layui-hide" id="demo" lay-filter="user"></table>
+</div>
+
+</body>
+<script>
+    layui.use('table', function () {
+        var table = layui.table;
+        //展示已知数据
+        table.render({
+            elem: '#demo'
+            , defaultToolbar: ['filter', 'exports', 'print']
+            , toolbar: '#toolbarDemo'
+            , cols: [[ //标题栏
+                {field: 'customer_id', title: 'ID', width: 80, sort: true}
+                , {field: 'customer_name', title: '客户公司名称', width: 120}
+                , {field: 'saleman_name', title: '业务员', minWidth: 150}
+                , {field: 'area', title: '所属区域', minWidth: 150}
+                , {field: 'area_responsible', title: '负责区域', minWidth: 150}
+                , {field: 'customer_lever', title: '经销商级别', minWidth: 150}
+                , {field: 'real_boss_and_phone', title: '实际老板及电话', minWidth: 150}
+                , {field: 'boss_chinese_zodiac', title: '老板属相', minWidth: 60}
+                , {field: 'company_birthday', title: '店庆日', minWidth: 80}
+                , {field: 'boss_birthday', title: '老板生日', minWidth: 80}
+                , {field: 'sale_product_all_is_qb', title: '所售产品是否全部是侨宝品牌', minWidth: 60}
+                , {field: 'right', title: '操作', toolbar: '#saleman_tool', width: 150}
+            ]],
+            data: [
+                {% for foo in all_search_customer %}
+                    {
+                        "customer_id": "{{foo.id}}"
+                        , "customer_name": "{{foo.customer}}"
+                        , "saleman_name": "{{foo.saleman}}"
+                        , "area": "{{foo.area}}"
+                        , "area_responsible": "{{foo.area_responsible}}"
+                        , "customer_lever": "{{foo.customer_level}}"
+                        , "real_boss_and_phone": "{{foo.real_boss_and_phone}}"
+                        , "boss_chinese_zodiac": "{{foo.boss_chinese_zodiac}}"
+                        , "company_birthday": "{{foo.company_birthday |date:'m-d'}}"
+                        , "boss_birthday": "{{foo.boss_birthday|date:'m-d'}}"
+                        , "sale_product_all_is_qb": "{{foo.sale_product_all_is_qb}}"
+                    },
+                {% endfor %}
+            ],
+            page: true,
+        })
+        ;
+        table.on('tool(user)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        url: "/delete_customer/",
+                        type: "POST",
+                        data: {id: data.customer_id},
+                        success: function (msg) {
+                            if (msg === 200) {
+                                //删除这一行
+                                obj.del();
+                                //关闭弹框
+                                layer.close(index);
+                                layer.msg("删除成功", {icon: 6});
+                            } else {
+                                obj.del();
+                                //关闭弹框
+                                layer.close(index);
+                                layer.msg("删除成功", {icon: 6});
+                            }
+                        }
+                    });
+                    return false;
+                });
+            } else if (obj.event === 'edit') {
+                layer.open({
+                    type: 2,
+                    data: {customer_id: data.customer_id},
+                    title: '客户信息编辑',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    area: ['80%', '80%'],
+                    content: '/edit_customer/?customer_id=' + data.customer_id
+                });
+            }
+        });
+    });
+</script>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData"></button>
+    </div>
+</script>
+<script type="text/html" id="saleman_tool">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="edit">编辑</button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete">删除</button>
+    </div>
+</script>
+</html>
