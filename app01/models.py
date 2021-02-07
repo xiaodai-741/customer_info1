@@ -66,14 +66,40 @@ class SalemanReceivable(models.Model):
     indexdate = models.DateField(null=True, blank=True)
     saleman = models.CharField(max_length=255, null=True)
     area = models.CharField(max_length=255, null=True)
-    money = models.CharField(max_length=255, null=True)
+    money = models.FloatField(max_length=255, null=True)
 
 
 class SalemanSaleInfo(models.Model):
-    index_date = models.DateField(null=True, blank=True)
     sale_date = models.DateField(null=True, blank=True)
     customer = models.CharField(max_length=255, null=True)
     product = models.CharField(max_length=255, null=True)
+    product_number = models.FloatField(max_length=255, null=True)
+    product_price = models.FloatField(max_length=255, null=True)
+    sale_money = models.FloatField(max_length=255, null=True)
     saleman = models.CharField(max_length=255, null=True)
-    sale_money = models.CharField(max_length=255, null=True)
     area = models.CharField(max_length=255, null=True)
+    remake = models.CharField(max_length=255, null=True)
+
+
+class SalemanReceivableInfo(models.Model):
+    date = models.DateTimeField(null=True, blank=True)
+    bank = models.CharField(max_length=255, null=True)
+    banking_heads = models.CharField(max_length=255, null=True)
+    money = models.FloatField(max_length=255, null=True)
+    customer = models.CharField(max_length=255, null=True)
+    saleman = models.CharField(max_length=255, null=True)
+    area = models.CharField(max_length=255, null=True)
+    remake = models.CharField(max_length=255, null=True)
+    earnest_money = models.FloatField(max_length=255, null=True)
+    push_money = models.FloatField(max_length=255, null=True)
+
+
+class CostTable(models.Model):
+    date = models.DateField(blank=True,null=True)
+    area = models.CharField(max_length=255, null=True)
+    saleman = models.CharField(max_length=255, null=True)
+    customer = models.CharField(max_length=255, null=True)
+    cost_type = models.CharField(max_length=255, null=True)
+    cost_number = models.FloatField(max_length=255, null=True)
+    remake = models.CharField(max_length=255, null=True)
+

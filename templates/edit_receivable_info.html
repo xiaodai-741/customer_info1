@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>回款信息修改</title>
+    <link rel="stylesheet" href="/static/lib/layui-v2.5.5/css/layui.css">
+    <script src="/static/lib/layui-v2.5.5/layui.js"></script>
+    <STYLE>
+        th {
+            font-size: x-large;
+        }
+    </STYLE>
+
+</head>
+<body>
+<form action="/edit_receivable_info/" method="post">
+    <table style='align-content: center;font-size: 30px' class="layui-table">
+        <thead>
+        <tr>
+            <th>
+                <h1 style="text-align: center">回款信息修改</h1>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th colspan="6">
+                <button class="layui-btn" style="margin-left:1%" lay-event="save" type="submit">保存</button>
+            </th>
+        </tr>
+        <tr>
+            <th style="font-size: large">
+                id
+            </th>
+            <th>
+                <label>
+                    <input type="text" class="layui-input" name='id' readonly value="{{ search_receivable_info.id }}">
+                </label>
+            </th>
+            <th style="font-size: large">
+                地区
+            </th>
+            <th>
+                <label>
+                    <input type="text" class="layui-input" list="areas"
+                           value="{{ search_receivable_info.area }}">
+                </label>
+                <datalist id="areas" style="display: none">
+                    {% for area in all_area_name %}
+                        <option name="area"> {{ area.area }}</option>
+                    {% endfor %}
+
+                </datalist>
+            </th>
+            <th style="font-size: large">
+                业务员
+            </th>
+            <th>
+                <label>
+                    <input type="text" class="layui-input"
+                           value="{{ search_receivable_info.saleman }}" list="salemans">
+                </label>
+                <datalist id="salemans" style="display: none">
+                    {% for saleman in all_saleman_name %}
+                        <option name="saleman"> {{ saleman.saleman }}</option>
+                    {% endfor %}
+
+                </datalist>
+            </th>
+        </tr>
+        <tr>
+            <th style="font-size: large">
+                客户公司名
+            </th>
+            <th colspan="2">
+                <label>
+                    <input type="text" class="layui-input" list="customers"
+                           value="{{ search_receivable_info.customer }}">
+                </label>
+                <datalist id="customers" style="display: none">
+                    {% for customer in all_customer_name %}
+                        <option name="customer"> {{ customer.customer }}</option>
+                    {% endfor %}
+
+                </datalist>
+            </th>
+            <th style="font-size: large">
+                交易银行
+            </th>
+            <th colspan="2">
+                <label>
+                    <input type="text" class="layui-input" name='bank'
+                           value="{{ search_receivable_info.bank }}">
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th style="font-size: large">
+                对方户名
+            </th>
+            <th colspan="2">
+                <label>
+                    <input type="text" class="layui-input" name='banking_heads'
+                           value="{{ search_receivable_info.banking_heads }}">
+                </label>
+            </th>
+            <th style="font-size: large">
+                交易时间
+            </th>
+            <th colspan="2">
+                <label>
+                    <input type="date" class="layui-input" name='date'
+                           value="{{ search_receivable_info.date |date:'Y-m-d' }}">
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th style="font-size: large">
+                交易金额
+            </th>
+            <th>
+                <label>
+                    <input type="text" class="layui-input" name="money" value="{{ search_receivable_info.money }}">
+                </label>
+            </th>
+            <th style="font-size: large">
+                保证金
+            </th>
+            <th>
+                <label>
+                    <input type="text" class="layui-input" name="earnest_money"
+                           value="{{ search_receivable_info.earnest_money }}">
+                </label>
+            </th>
+            <th style="font-size: large">
+                提成金额
+            </th>
+            <th>
+                <label>
+                    <input type="text" class="layui-input" name="push_money"
+                           value="{{ search_receivable_info.push_money }}">
+                </label>
+            </th>
+        </tr>
+        <tr>
+            <th style="font-size: large">
+                备注
+            </th>
+            <th colspan="5">
+                <label>
+                    <input type="text" class="layui-input" name="remake"
+                           value="{{ search_receivable_info.remake }}">
+                </label>
+            </th>
+        </tr>
+        </tbody>
+    </table>
+</form>
+</body>
+</html>

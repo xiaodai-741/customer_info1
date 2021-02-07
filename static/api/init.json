@@ -56,115 +56,21 @@
           ]
         },
         {
-          "title": "区域设置",
-          "href": "../layuimini/page/setting.html",
-          "icon": "fa fa-gears",
-          "target": "_self"
-        },
-        {
-          "title": "系统设置",
-          "href": "../layuimini/page/table.html",
+          "title": "销售信息",
+          "href": "/sale_money_info/",
           "icon": "fa fa-file-text",
           "target": "_self"
-        }
-      ]
-    },
-    {
-      "title": "组件管理",
-      "icon": "fa fa-lemon-o",
-      "href": "",
-      "target": "_self",
-      "child": [
+        },
         {
-          "title": "图标列表",
-          "href": "../layuimini/page/icon.html",
-          "icon": "fa fa-dot-circle-o",
+          "title": "回款信息",
+          "href": "/receivable_info/",
+          "icon": "fa fa-file-text",
           "target": "_self"
         },
         {
-          "title": "图标选择",
-          "href": "../layuimini/page/icon-picker.html",
-          "icon": "fa fa-adn",
-          "target": "_self"
-        },
-        {
-          "title": "颜色选择",
-          "href": "../layuimini/page/color-select.html",
-          "icon": "fa fa-dashboard",
-          "target": "_self"
-        },
-        {
-          "title": "下拉选择",
-          "href": "../layuimini/page/table-select.html",
-          "icon": "fa fa-angle-double-down",
-          "target": "_self"
-        },
-        {
-          "title": "文件上传",
-          "href": "../layuimini/page/upload.html",
-          "icon": "fa fa-arrow-up",
-          "target": "_self"
-        },
-        {
-          "title": "富文本编辑器",
-          "href": "../layuimini/page/editor.html",
-          "icon": "fa fa-edit",
-          "target": "_self"
-        },
-        {
-          "title": "省市县区选择器",
-          "href": "../layuimini/page/area.html",
-          "icon": "fa fa-rocket",
-          "target": "_self"
-        }
-      ]
-    },
-    {
-      "title": "其它管理",
-      "icon": "fa fa-slideshare",
-      "href": "",
-      "target": "_self",
-      "child": [
-        {
-          "title": "多级菜单",
-          "href": "",
-          "icon": "fa fa-meetup",
-          "target": "",
-          "child": [
-            {
-              "title": "按钮1",
-              "href": "../layuimini/page/button.html?v=1",
-              "icon": "fa fa-calendar",
-              "target": "_self",
-              "child": [
-                {
-                  "title": "按钮2",
-                  "href": "../layuimini/page/button.html?v=2",
-                  "icon": "fa fa-snowflake-o",
-                  "target": "_self",
-                  "child": [
-                    {
-                      "title": "按钮3",
-                      "href": "../layuimini/page/button.html?v=3",
-                      "icon": "fa fa-snowflake-o",
-                      "target": "_self"
-                    },
-                    {
-                      "title": "表单4",
-                      "href": "../layuimini/page/form.html?v=1",
-                      "icon": "fa fa-calendar",
-                      "target": "_self"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "title": "失效菜单",
-          "href": "../layuimini/page/error.html",
-          "icon": "fa fa-superpowers",
+          "title": "费用信息",
+          "href": "/cost/",
+          "icon": "fa fa-file-text",
           "target": "_self"
         }
       ]

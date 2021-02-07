@@ -4,6 +4,7 @@ import MySQLdb
 import win32api
 import win32con
 import arrow
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from app01 import models as md
@@ -39,7 +40,273 @@ def user_judge(request):
 
 
 def welcome(request):
-    return render(request, 'welcome.html')
+    six_sale_money_date = []
+    month_list = []
+    six_receivable_date = []
+    six_cost_date = []
+    six_chai_lv_cost_date = []
+    six_yang_pin_cost_date = []
+    six_pin_jian_cost_date = []
+    six_he_xiao_cost_date = []
+    product_date_name_list = []
+    product_date_price_list = []
+    product_number_list = [0, 1, 2, 3, 4]
+    product_sql = f"SELECT id,product,sum(sale_money) sale_money FROM app01_salemansaleinfo WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( sale_date, '%%Y%%m' ) ) =5 GROUP BY product ORDER BY sum(sale_money) DESC LIMIT 7"
+    product_date = md.SalemanSaleInfo.objects.raw(product_sql)
+    for i in range(6):
+        sale_money_sql = f"SELECT id,sum(sale_money) sale_money FROM app01_salemansaleinfo WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( sale_date, '%%Y%%m' ) ) =5-{i} "
+        receivable_sql = f"SELECT id,sum(money) sum_money FROM app01_salemanreceivable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( indexdate, '%%Y%%m' ) ) =5-{i} "
+        cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} "
+        chai_lv_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i}  and cost_type='差旅费'"
+        yang_pin_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='样品费'"
+        pin_jian_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='品鉴费'"
+        he_xiao_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='核销费'"
+        month = arrow.now().shift(months=i - 5).format("YYYY-MM")
+        month_list.append(month)
+        print(he_xiao_cost_sql)
+        sum_sale_money = md.SalemanSaleInfo.objects.raw(sale_money_sql)
+        saleman_receivable = md.SalemanSaleInfo.objects.raw(receivable_sql)
+        cost_number = md.CostTable.objects.raw(cost_sql)
+        chai_lv_cost_number = md.CostTable.objects.raw(chai_lv_cost_sql)
+        yang_pin_cost_number = md.CostTable.objects.raw(yang_pin_cost_sql)
+        pin_jian_cost_number = md.CostTable.objects.raw(pin_jian_cost_sql)
+        he_xiao_cost_number = md.CostTable.objects.raw(he_xiao_cost_sql)
+        print(he_xiao_cost_number[0].sum_money)
+        six_he_xiao_cost_date.append(he_xiao_cost_number[0].sum_money)
+        try:
+            sum_sale_money1 = sum_sale_money[0].sale_money
+            six_sale_money_date.append(round(float(sum_sale_money1), 2))
+        except Exception:
+            sum_sale_money = 0
+            six_sale_money_date.append(sum_sale_money)
+        try:
+            saleman_receivable1 = saleman_receivable[0].sum_money
+            six_receivable_date.append(round(float(saleman_receivable1), 2))
+        except Exception:
+            saleman_receivable = 0
+            six_receivable_date.append(saleman_receivable)
+        try:
+            product_date_name_list.append(product_date[i].product)
+            product_date_price_list.append(product_date[i].sale_money)
+        except Exception:
+            product_date_name_list.append('无')
+            product_date_price_list.append(0)
+        if cost_number[0].sum_money is not None:
+            cost_money = cost_number[0].sum_money
+            six_cost_date.append(round(float(cost_money), 2))
+        else:
+            cost_money = 0
+            six_sale_money_date.append(cost_money)
+    print(six_he_xiao_cost_date)
+    before_one_month_receivable = abs(six_receivable_date[3] - six_receivable_date[2])
+    before_two_month_receivable = abs(six_receivable_date[3] - six_receivable_date[1])
+    before_one_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[2])
+    before_two_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[1])
+    before_one_month_cost_number = abs(six_cost_date[3] - six_cost_date[2])
+    before_two_month_cost_number = abs(six_cost_date[3] - six_cost_date[1])
+    return render(request, "welcome.html",
+                  {'six_sale_money_date': six_sale_money_date,
+                   'month_list': month_list, 'six_receivable_date': six_receivable_date,
+                   'six_cost_date': six_cost_date, 'product_date_name_list': product_date_name_list,
+                   'product_date_price_list': product_date_price_list, 'product_number_list': product_number_list,
+                   'before_one_month_receivable': before_one_month_receivable,
+                   'before_two_month_receivable': before_two_month_receivable,
+                   'before_one_month_sale_money': before_one_month_sale_money,
+                   'before_two_month_sale_money': before_two_month_sale_money,
+                   'before_one_month_cost_number': before_one_month_cost_number,
+                   'before_two_month_cost_number': round(before_two_month_cost_number, 2)})
+
+
+def receivable_info(request):
+    all_customer_name = md.SalemanReceivableInfo.objects.all().values('customer').distinct()
+    all_saleman_name = md.SalemanReceivableInfo.objects.all().values('saleman').distinct()
+    all_area_name = md.SalemanReceivableInfo.objects.all().values('area').distinct()
+    money_sql = f"select id , sum(money) sum_money from app01_salemanreceivableinfo  "
+    if request.method == 'GET':
+        all_info = md.SalemanReceivableInfo.objects.all()
+        # print(all_info[0].date)
+    else:
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        customer = request.POST.get('customer')
+        saleman = request.POST.get('saleman')
+        area = request.POST.get('area')
+        sql = f"select * from app01_salemanreceivableinfo where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and saleman like '%%{saleman}%%' and customer like '%%{customer}%%'and area like '%%{area}%%' "
+        money_sql = f"select id , sum(money) sum_money from app01_salemanreceivableinfo where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and saleman like '%%{saleman}%%' and customer like '%%{customer}%%'and area like '%%{area}%%' "
+        all_info = md.SalemanReceivableInfo.objects.raw(sql)
+    sum_receivable = md.SalemanReceivableInfo.objects.raw(money_sql)[0].sum_money
+    return render(request, 'receivable_info.html',
+                  {'all_info': all_info, 'all_customer_name': all_customer_name, 'all_saleman_name': all_saleman_name,
+                   'all_area_name': all_area_name, 'sum_receivable': sum_receivable})
+
+
+def delete_receivable_info(request):
+    if request.method == 'POST':
+        receivable_id = request.POST.get('id')
+        md.SalemanReceivableInfo.objects.filter(id=receivable_id).delete()
+        return redirect('/receivable_info')
+
+
+def edit_receivable_info(request):
+    all_customer_name = md.SalemanReceivableInfo.objects.all().values('customer').distinct()
+    all_saleman_name = md.SalemanReceivableInfo.objects.all().values('saleman').distinct()
+    all_area_name = md.SalemanReceivableInfo.objects.all().values('area').distinct()
+    if request.method == 'GET':
+        receivable_info_id = request.GET.get('id')
+
+        search_receivable_info = md.SalemanReceivableInfo.objects.get(id=receivable_info_id)
+        return render(request, 'edit_receivable_info.html',
+                      {'search_receivable_info': search_receivable_info, 'all_customer_name': all_customer_name,
+                       'all_saleman_name': all_saleman_name,
+                       'all_area_name': all_area_name})
+    else:
+        receivable_info_id = request.POST.get('id')
+        customer = request.POST.get('customer')
+        bank = request.POST.get('bank')
+        banking_heads = request.POST.get('banking_heads')
+        date = request.POST.get('date')
+        money = request.POST.get('money')
+        saleman = request.POST.get('saleman')
+        area = request.POST.get('area')
+        earnest_money = request.POST.get('earnest_money')
+        push_money = request.POST.get('push_money')
+        remake = request.POST.get('remake')
+        judge_date = len(date)
+        sql = f"UPDATE app01_salemanreceivableinfo SET customer = '{customer}' ,bank = '{bank}', banking_heads ='{banking_heads}', date = if({judge_date}=0  ,null,'{date}'),money='{money}',earnest_money='{earnest_money}',push_money='{push_money}',remake = '{remake}',saleman = '{saleman}',area = '{area}' where id = {receivable_info_id} "
+        # win32api.MessageBox(0, "修改成功", "修改成功", win32con.MB_OK)
+        db = MySQLdb.connect(user='root', db='customertable1', passwd='root', host='localhost', charset='utf8')
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        db.close()
+        return HttpResponse('修改成功')
+
+
+def sale_money_info(request):
+    all_customer_name = md.SalemanSaleInfo.objects.all().values('customer').distinct()
+    all_product_name = md.SalemanSaleInfo.objects.all().values('product').distinct()
+    all_saleman_name = md.SalemanSaleInfo.objects.all().values('saleman').distinct()
+    all_area_name = md.SalemanSaleInfo.objects.all().values('area').distinct()
+    sum_sql = "select id,sum(sale_money) sum_money from app01_salemansaleinfo"
+    if request.method == 'GET':
+        all_info = md.SalemanSaleInfo.objects.all()
+    else:
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        customer = request.POST.get('customer')
+        product = request.POST.get('product')
+        saleman = request.POST.get('saleman')
+        area = request.POST.get('area')
+        sql = f"select * from app01_salemansaleinfo where date (sale_date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and saleman like '%%{saleman}%%' and customer like '%%{customer}%%'and product like '%%{product}%%'and saleman like '%%{saleman}%%'and area like '%%{area}%%'"
+        sum_sql = f"select id,sum(sale_money) sum_money from app01_salemansaleinfo where date (sale_date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and saleman like '%%{saleman}%%' and customer like '%%{customer}%%'and product like '%%{product}%%'and saleman like '%%{saleman}%%'and area like '%%{area}%%'"
+        all_info = md.SalemanSaleInfo.objects.raw(sql)
+    sum_money = md.SalemanSaleInfo.objects.raw(sum_sql)[0].sum_money
+    return render(request, 'sale_money_info.html',
+                  {'all_info': all_info, 'all_customer_name': all_customer_name, 'all_product_name': all_product_name,
+                   'all_saleman_name': all_saleman_name, 'all_area_name': all_area_name, 'sum_money': sum_money})
+
+
+def delete_sale_money_info(request):
+    if request.method == 'POST':
+        sale_money_info_id = request.POST.get('id')
+        md.SalemanSaleInfo.objects.filter(id=sale_money_info_id).delete()
+        return redirect('/sale_money_info')
+
+
+def edit_sale_money_info(request):
+    all_customer_name = md.SalemanSaleInfo.objects.all().values('customer').distinct()
+    all_product_name = md.SalemanSaleInfo.objects.all().values('product').distinct()
+    all_saleman_name = md.SalemanSaleInfo.objects.all().values('saleman').distinct()
+    all_area_name = md.SalemanSaleInfo.objects.all().values('area').distinct()
+    if request.method == 'GET':
+        sale_money_info_id = request.GET.get('id')
+        search_sale_money_info = md.SalemanSaleInfo.objects.get(id=sale_money_info_id)
+        return render(request, 'edit_sale_money_info.html',
+                      {'search_sale_money_info': search_sale_money_info, 'all_customer_name': all_customer_name,
+                       'all_product_name': all_product_name,
+                       'all_saleman_name': all_saleman_name, 'all_area_name': all_area_name})
+    else:
+        sale_money_info_id = request.POST.get('id')
+        customer = request.POST.get('customer')
+        date = request.POST.get('date')
+        product = request.POST.get('product')
+        number = request.POST.get('number')
+        price = request.POST.get('price')
+        sale_money = request.POST.get('sale_money')
+        remake = request.POST.get('remake')
+        judge_date = len(date)
+        sql = f"UPDATE app01_salemansaleinfo SET customer = '{customer}' ,product = '{product}', product_number ='{number}', sale_date = if({judge_date}=0  ,null,'{date}'),product_price='{price}',sale_money='{sale_money}',remake = '{remake}' where id = {sale_money_info_id} "
+        # win32api.MessageBox(0, "修改成功", "修改成功", win32con.MB_OK)
+        db = MySQLdb.connect(user='root', db='customertable1', passwd='root', host='localhost', charset='utf8')
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        db.close()
+        return HttpResponse('修改成功')
+
+
+def cost(request):
+    all_type = md.CostTable.objects.all().values('cost_type').distinct()
+    all_area = md.CostTable.objects.all().values('area').distinct()
+    all_saleman_name = md.CostTable.objects.all().values('saleman').distinct()
+    all_customer_name = md.CostTable.objects.all().values('customer').distinct()
+    all_cost_info = md.CostTable.objects.all()
+    cost_sum = md.CostTable.objects.aggregate(sum=Sum('cost_number'))['sum']
+    if request.method == 'POST':
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        saleman = request.POST.get('saleman')
+        customer = request.POST.get('customer')
+        cost_type = request.POST.get('type')
+        area = request.POST.get('area')
+        sql = f"select * from app01_costtable where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and if(length('{customer}')=0,ISNULL(customer),customer='{customer}' ) and saleman like '%%{saleman}%%' and area like '%%{area}%%'and cost_type like '%%{cost_type}%%'"
+        money_sql = f"select id, sum(cost_number) cost_sum from app01_costtable where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and if(length('{customer}')=0,ISNULL(customer),customer='{customer}' ) and saleman like '%%{saleman}%%' and area like '%%{area}%%'and cost_type like '%%{cost_type}%%'"
+
+        all_cost_info = md.CostTable.objects.raw(sql)
+        cost_sum = md.CostTable.objects.raw(money_sql)[0].cost_sum
+        print(money_sql)
+    return render(request, 'cost.html',
+                  {'all_type': all_type, 'all_area': all_area, 'all_saleman_name': all_saleman_name,
+                   'all_customer_name': all_customer_name, 'all_cost_info': all_cost_info,
+                   'cost_sum': cost_sum})
+
+
+def delete_cost_info(request):
+    if request.method == 'POST':
+        cost_info_id = request.POST.get('id')
+        md.CostTable.objects.filter(id=cost_info_id).delete()
+        return redirect('/cost')
+
+
+def edit_cost_info(request):
+    all_type = md.CostTable.objects.all().values('cost_type').distinct()
+    all_area = md.CostTable.objects.all().values('area').distinct()
+    all_saleman_name = md.CostTable.objects.all().values('saleman').distinct()
+    all_customer_name = md.CostTable.objects.all().values('customer').distinct()
+    if request.method == 'GET':
+        cost_info_id = request.GET.get('id')
+        search_cost_info = md.CostTable.objects.get(id=cost_info_id)
+        return render(request, 'edit_cost_info.html',
+                      {'search_cost_info': search_cost_info, 'all_type': all_type, 'all_area': all_area,
+                       'all_saleman_name': all_saleman_name,
+                       'all_customer_name': all_customer_name})
+    else:
+        cost_info_id = request.POST.get('id')
+        saleman = request.POST.get('saleman')
+        customer = request.POST.get('customer')
+        cost_type = request.POST.get('type')
+        date = request.POST.get('date')
+        cost_number = request.POST.get('cost_number')
+        remake = request.POST.get('remake')
+        judge_date = len(date)
+        sql = f"UPDATE app01_costtable SET customer = '{customer}' ,saleman = '{saleman}', cost_number ='{cost_number}', date = if({judge_date}=0  ,null,'{date}'),cost_type='{cost_type}',remake = '{remake}' where id = {cost_info_id} "
+        # win32api.MessageBox(0, "修改成功", "修改成功", win32con.MB_OK)
+        db = MySQLdb.connect(user='root', db='customertable1', passwd='root', host='localhost', charset='utf8')
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        db.close()
+        return HttpResponse('修改成功')
 
 
 def manage_index(request):
@@ -58,12 +325,10 @@ def all_saleman(request):
         print(territory, type(territory))
         if territory is not None:
             all_search_saleman = md.Saleman.objects.raw(sql)
-            print(sql)
-            print(all_search_saleman[0].name)
-            print(22)
+            # print(sql)
+            # print(all_search_saleman[0].name)
         else:
             all_search_saleman = md.Saleman.objects.raw(sql1)
-            print(11)
     # print(all_search_saleman[0].name)
     return render(request, 'saleman/all_saleman.html',
                   {'all_search_saleman': all_search_saleman, 'search_territory': search_territory})
@@ -201,7 +466,6 @@ def all_customer(request):
         if company_birthday:
             search_dict['company_birthday__month'] = company_birthday
         all_search_customer = md.Customer.objects.filter(**search_dict)
-        # all_search_customer = md.Customer.objects.filter(b)
     return render(request, 'customer/all_customer.html',
                   {'all_search_customer': all_search_customer, 'search_customer_level': search_customer_level,
                    'search_all_saleman': search_all_saleman, 'search_all_area': search_all_area,
@@ -402,6 +666,7 @@ def add_customer(request):
 
 def saleman_welcome(request):
     saleman_name = request.GET.get('saleman_name')
+    request.session['saleman'] = saleman_name
     six_sale_money_date = []
     month_list = []
     six_receivable_date = []
@@ -409,14 +674,14 @@ def saleman_welcome(request):
     product_date_price_list = []
     product_number_list = [0, 1, 2, 3, 4]
     product_sql = f"SELECT id,product,sum(sale_money) sale_money FROM app01_salemansaleinfo WHERE saleman = '{saleman_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( sale_date, '%%Y%%m' ) ) =5 GROUP BY product ORDER BY sum(sale_money) DESC LIMIT 7"
-    print(product_sql)
+    # print(product_sql)
     product_date = md.SalemanSaleInfo.objects.raw(product_sql)
     for i in range(6):
         sale_money_sql = f"SELECT id,sum(sale_money) sale_money FROM app01_salemansaleinfo WHERE saleman = '{saleman_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( sale_date, '%%Y%%m' ) ) =5-{i} "
         receivable_sql = f"SELECT id,sum(money) sum_money FROM app01_salemanreceivable WHERE saleman = '{saleman_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( indexdate, '%%Y%%m' ) ) =5-{i} "
         month = arrow.now().shift(months=i - 5).format("YYYY-MM")
         month_list.append(month)
-        # print(sale_money_sql)
+        print(sale_money_sql)
         sum_sale_money = md.SalemanSaleInfo.objects.raw(sale_money_sql)
         saleman_receivable = md.SalemanSaleInfo.objects.raw(receivable_sql)
         try:
@@ -445,7 +710,7 @@ def saleman_welcome(request):
     before_one_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[2])
     before_two_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[1])
     return render(request, "saleman/saleman_welcome.html",
-                  {'six_sale_money_date': six_sale_money_date,
+                  {'saleman_name': saleman_name, 'six_sale_money_date': six_sale_money_date,
                    'month_list': month_list, 'six_receivable_date': six_receivable_date,
                    'product_date_name_list': product_date_name_list,
                    'product_date_price_list': product_date_price_list, 'product_number_list': product_number_list,
@@ -453,3 +718,279 @@ def saleman_welcome(request):
                    'before_two_month_receivable': before_two_month_receivable,
                    'before_one_month_sale_money': before_one_month_sale_money,
                    'before_two_month_sale_money': before_two_month_sale_money})
+
+
+def saleman_receivable_info(request):
+    saleman_name = request.session['saleman']
+    sum_sql = f"select id,sum(money) sum_money from app01_salemanreceivableinfo where saleman = '{saleman_name}'"
+    if request.method == 'GET':
+        all_info = md.SalemanReceivableInfo.objects.filter(saleman=saleman_name)
+        # print(all_info[0].date)
+    else:
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        sql = f"select * from app01_salemanreceivableinfo where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and saleman = '{saleman_name}'"
+        sum_sql = f"select id,sum(money) sum_money from app01_salemanreceivableinfo where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and saleman = '{saleman_name}'"
+        all_info = md.SalemanReceivableInfo.objects.raw(sql)
+    sum_money = md.SalemanReceivableInfo.objects.raw(sum_sql)[0].sum_money
+    print(sum_money)
+    return render(request, 'saleman/saleman-info/saleman_receivable_info.html',
+                  {'aii_info': all_info, 'sum_money': sum_money})
+
+
+def delete_saleman_receivable_info(request):
+    if request.method == 'POST':
+        receivable_id = request.POST.get('id')
+        md.SalemanReceivableInfo.objects.filter(id=receivable_id).delete()
+        return redirect('/saleman_receivable_info')
+
+
+def edit_saleman_receivable_info(request):
+    if request.method == 'GET':
+        receivable_info_id = request.GET.get('id')
+
+        search_receivable_info = md.SalemanReceivableInfo.objects.get(id=receivable_info_id)
+        return render(request, 'saleman/saleman-info/edit_saleman_receivable_info.html',
+                      {'search_receivable_info': search_receivable_info})
+    else:
+        receivable_info_id = request.POST.get('id')
+        customer = request.POST.get('customer')
+        bank = request.POST.get('bank')
+        banking_heads = request.POST.get('banking_heads')
+        date = request.POST.get('date')
+        money = request.POST.get('money')
+        earnest_money = request.POST.get('earnest_money')
+        push_money = request.POST.get('push_money')
+        remake = request.POST.get('remake')
+        judge_date = len(date)
+        sql = f"UPDATE app01_salemanreceivableinfo SET customer = '{customer}' ,bank = '{bank}', banking_heads ='{banking_heads}', date = if({judge_date}=0  ,null,'{date}'),money='{money}',earnest_money='{earnest_money}',push_money='{push_money}',remake = '{remake}' where id = {receivable_info_id} "
+        # win32api.MessageBox(0, "修改成功", "修改成功", win32con.MB_OK)
+        db = MySQLdb.connect(user='root', db='customertable1', passwd='root', host='localhost', charset='utf8')
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        db.close()
+        return HttpResponse('修改成功')
+
+
+def saleman_sale_money_info(request):
+    saleman_name = request.session['saleman']
+    all_customer_name = md.SalemanSaleInfo.objects.filter(saleman=saleman_name).all().values('customer').distinct()
+    all_product_name = md.SalemanSaleInfo.objects.filter(saleman=saleman_name).all().values('product').distinct()
+    sum_sql = f"select id,sum(sale_money) sum_money from app01_salemansaleinfo where saleman = '{saleman_name}'"
+    print(saleman_name)
+    if request.method == 'GET':
+        all_info = md.SalemanSaleInfo.objects.filter(saleman=saleman_name)
+    else:
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        customer = request.POST.get('customer')
+        product = request.POST.get('product')
+        sql = f"select * from app01_salemansaleinfo where date (sale_date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and saleman = '{saleman_name}' and customer like '%%{customer}%%'and product like '%%{product}%%'"
+        sum_sql = f"select id,sum(sale_money) sum_money from app01_salemansaleinfo where date (sale_date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and saleman = '{saleman_name}' and customer like '%%{customer}%%'and product like '%%{product}%%'"
+        all_info = md.SalemanSaleInfo.objects.raw(sql)
+    sum_money = md.SalemanSaleInfo.objects.raw(sum_sql)[0].sum_money
+    return render(request, 'saleman/saleman-info/saleman_sale_money_info.html',
+                  {'all_info': all_info, 'all_customer_name': all_customer_name, 'all_product_name': all_product_name,
+                   'sum_money': sum_money})
+
+
+def delete_saleman_sale_money_info(request):
+    if request.method == 'POST':
+        sale_money_info_id = request.POST.get('id')
+        md.SalemanSaleInfo.objects.filter(id=sale_money_info_id).delete()
+        return redirect('/saleman_sale_money_info')
+
+
+def edit_saleman_sale_money_info(request):
+    saleman_name = request.session['saleman']
+    all_customer_name = md.SalemanSaleInfo.objects.filter(saleman=saleman_name).all().values('customer').distinct()
+    all_product_name = md.SalemanSaleInfo.objects.filter(saleman=saleman_name).all().values('product').distinct()
+    if request.method == 'GET':
+        sale_money_info_id = request.GET.get('id')
+        search_sale_money_info = md.SalemanSaleInfo.objects.get(id=sale_money_info_id)
+        return render(request, 'saleman/saleman-info/edit_saleman_sale_money_info.html',
+                      {'search_sale_money_info': search_sale_money_info, 'all_customer_name': all_customer_name,
+                       'all_product_name': all_product_name})
+    else:
+        sale_money_info_id = request.POST.get('id')
+        customer = request.POST.get('customer')
+        date = request.POST.get('date')
+        product = request.POST.get('product')
+        number = request.POST.get('number')
+        price = request.POST.get('price')
+        sale_money = request.POST.get('sale_money')
+        remake = request.POST.get('remake')
+        judge_date = len(date)
+        sql = f"UPDATE app01_salemansaleinfo SET customer = '{customer}' ,product = '{product}', product_number ='{number}', sale_date = if({judge_date}=0  ,null,'{date}'),product_price='{price}',sale_money='{sale_money}',remake = '{remake}' where id = {sale_money_info_id} "
+        # win32api.MessageBox(0, "修改成功", "修改成功", win32con.MB_OK)
+        db = MySQLdb.connect(user='root', db='customertable1', passwd='root', host='localhost', charset='utf8')
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        db.close()
+        return HttpResponse('修改成功')
+
+
+def customer_welcome(request):
+    customer_name = request.GET.get('customer_name')
+    request.session['customer_name'] = customer_name
+    six_sale_money_date = []
+    month_list = []
+    six_receivable_date = []
+    product_date_name_list = []
+    product_date_price_list = []
+    product_number_list = [0, 1, 2, 3, 4]
+    product_sql = f"SELECT id,product,sum(sale_money) sale_money FROM app01_salemansaleinfo WHERE customer = '{customer_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( sale_date, '%%Y%%m' ) ) =5 GROUP BY product ORDER BY sum(sale_money) DESC LIMIT 7"
+    # print(product_sql)
+    product_date = md.SalemanSaleInfo.objects.raw(product_sql)
+    for i in range(6):
+        sale_money_sql = f"SELECT id,sum(sale_money) sale_money FROM app01_salemansaleinfo WHERE customer = '{customer_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( sale_date, '%%Y%%m' ) ) =5-{i} "
+        receivable_sql = f"SELECT id,sum(money) sum_money FROM app01_salemanreceivableinfo WHERE customer= '{customer_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} "
+        month = arrow.now().shift(months=i - 5).format("YYYY-MM")
+        month_list.append(month)
+        print(receivable_sql)
+        sum_sale_money = md.SalemanSaleInfo.objects.raw(sale_money_sql)
+        saleman_receivable = md.SalemanSaleInfo.objects.raw(receivable_sql)
+        try:
+            sum_sale_money1 = sum_sale_money[0].sale_money
+            six_sale_money_date.append(round(float(sum_sale_money1), 2))
+        except Exception:
+            sum_sale_money = 0
+            six_sale_money_date.append(sum_sale_money)
+        try:
+            saleman_receivable1 = saleman_receivable[0].sum_money
+            six_receivable_date.append(round(float(saleman_receivable1), 2))
+        except Exception:
+            saleman_receivable = 0
+            six_receivable_date.append(saleman_receivable)
+        try:
+            product_date_name_list.append(product_date[i].product)
+            product_date_price_list.append(product_date[i].sale_money)
+        except Exception:
+            product_date_name_list.append('无')
+            product_date_price_list.append(0)
+    print(six_sale_money_date)
+    print(six_receivable_date)
+    print(month_list)
+    before_one_month_receivable = abs(six_receivable_date[3] - six_receivable_date[2])
+    before_two_month_receivable = abs(six_receivable_date[3] - six_receivable_date[1])
+    before_one_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[2])
+    before_two_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[1])
+    return render(request, "customer/customer_welcome.html",
+                  {'customer_name': customer_name, 'six_sale_money_date': six_sale_money_date,
+                   'month_list': month_list, 'six_receivable_date': six_receivable_date,
+                   'product_date_name_list': product_date_name_list,
+                   'product_date_price_list': product_date_price_list, 'product_number_list': product_number_list,
+                   'before_one_month_receivable': before_one_month_receivable,
+                   'before_two_month_receivable': before_two_month_receivable,
+                   'before_one_month_sale_money': before_one_month_sale_money,
+                   'before_two_month_sale_money': before_two_month_sale_money})
+
+
+def customer_receivable_info(request):
+    customer_name = request.session['customer_name']
+    sum_sql = f"select id, sum(money) from app01_salemanreceivableinfo where customer='{customer_name}'"
+    if request.method == 'GET':
+        all_info = md.SalemanReceivableInfo.objects.filter(customer=customer_name)
+        # print(all_info[0].date)
+    else:
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        sql = f"select * from app01_salemanreceivableinfo where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and customer = '{customer_name}'"
+        sum_sql = f"select  id, sum(money) from app01_salemanreceivableinfo where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and customer = '{customer_name}'"
+        all_info = md.SalemanReceivableInfo.objects.raw(sql)
+    sum_money = md.SalemanReceivableInfo.objects.raw(sum_sql)[0].sum_money
+    return render(request, 'customer/customer_info/customer_receivable_info.html',
+                  {'aii_info': all_info, 'sum_money': sum_money})
+
+
+def delete_customer_receivable_info(request):
+    if request.method == 'POST':
+        receivable_id = request.POST.get('id')
+        md.SalemanReceivableInfo.objects.filter(id=receivable_id).delete()
+        return redirect('/customer_receivable_info')
+
+
+def edit_customer_receivable_info(request):
+    # saleman_id = request.POST.get('id')
+    if request.method == 'GET':
+        receivable_info_id = request.GET.get('id')
+
+        search_receivable_info = md.SalemanReceivableInfo.objects.get(id=receivable_info_id)
+        return render(request, 'customer/customer_info/edit_customer_receivable_info.html',
+                      {'search_receivable_info': search_receivable_info})
+    else:
+        receivable_info_id = request.POST.get('id')
+        saleman = request.POST.get('saleman')
+        bank = request.POST.get('bank')
+        banking_heads = request.POST.get('banking_heads')
+        date = request.POST.get('date')
+        money = request.POST.get('money')
+        earnest_money = request.POST.get('earnest_money')
+        push_money = request.POST.get('push_money')
+        remake = request.POST.get('remake')
+        judge_date = len(date)
+        sql = f"UPDATE app01_salemanreceivableinfo SET saleman = '{saleman}' ,bank = '{bank}', banking_heads ='{banking_heads}', date = if({judge_date}=0  ,null,'{date}'),money='{money}',earnest_money='{earnest_money}',push_money='{push_money}',remake = '{remake}' where id = {receivable_info_id} "
+        # win32api.MessageBox(0, "修改成功", "修改成功", win32con.MB_OK)
+        db = MySQLdb.connect(user='root', db='customertable1', passwd='root', host='localhost', charset='utf8')
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        db.close()
+        return HttpResponse('修改成功')
+
+
+def customer_money_info(request):
+    customer_name = request.session['customer_name']
+    sum_sql = f"select id, sum(sale_money) from app01_salemansaleinfo where customer='{customer_name}'"
+    all_saleman_name = md.SalemanSaleInfo.objects.filter(customer=customer_name).all().values('saleman').distinct()
+    all_product_name = md.SalemanSaleInfo.objects.filter(customer=customer_name).all().values('product').distinct()
+    if request.method == 'GET':
+        all_info = md.SalemanSaleInfo.objects.filter(customer=customer_name)
+    else:
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        saleman = request.POST.get('saleman')
+        product = request.POST.get('product')
+        sql = f"select * from app01_salemansaleinfo where date (sale_date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and customer = '{customer_name}' and saleman like '%%{saleman}%%'and product like '%%{product}%%'"
+        sum_sql = f"select id, sum(sale_money) from app01_salemansaleinfo where date (sale_date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and customer = '{customer_name}' and saleman like '%%{saleman}%%'and product like '%%{product}%%'"
+        all_info = md.SalemanSaleInfo.objects.raw(sql)
+    sum_money = md.SalemanSaleInfo.objects.raw(sum_sql)[0].sum_money
+    return render(request, 'customer/customer_info/customer_money_info.html',
+                  {'all_info': all_info, 'all_saleman_name': all_saleman_name, 'all_product_name': all_product_name,
+                   'sum_money': sum_money})
+
+
+def delete_customer_sale_money_info(request):
+    if request.method == 'POST':
+        sale_money_info_id = request.POST.get('id')
+        md.SalemanSaleInfo.objects.filter(id=sale_money_info_id).delete()
+        return redirect('/sale_customer_money_info')
+
+
+def edit_customer_sale_money_info(request):
+    # saleman_id = request.POST.get('id')
+    if request.method == 'GET':
+        sale_money_info_id = request.GET.get('id')
+        search_sale_money_info = md.SalemanSaleInfo.objects.get(id=sale_money_info_id)
+        return render(request, 'customer/customer_info/edit_customer_sale_money_info.html',
+                      {'search_sale_money_info': search_sale_money_info})
+    else:
+        sale_money_info_id = request.POST.get('id')
+        customer = request.POST.get('customer')
+        date = request.POST.get('date')
+        product = request.POST.get('product')
+        number = request.POST.get('number')
+        price = request.POST.get('price')
+        sale_money = request.POST.get('sale_money')
+        remake = request.POST.get('remake')
+        judge_date = len(date)
+        sql = f"UPDATE app01_salemansaleinfo SET customer = '{customer}' ,product = '{product}', product_number ='{number}', sale_date = if({judge_date}=0  ,null,'{date}'),product_price='{price}',sale_money='{sale_money}',remake = '{remake}' where id = {sale_money_info_id} "
+        # win32api.MessageBox(0, "修改成功", "修改成功", win32con.MB_OK)
+        db = MySQLdb.connect(user='root', db='customertable1', passwd='root', host='localhost', charset='utf8')
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        connection.commit()
+        db.close()
+        return HttpResponse('修改成功')

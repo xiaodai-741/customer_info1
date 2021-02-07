@@ -16,9 +16,9 @@
     <script src="../../../static/js/bootstrap-table-expandable.js"></script>
 </head>
 <body>
-<form action="/saleman_receivable_info/" method="post">
+<form action="/saleman_sale_money_info/" method="post">
     <div class="demoTable">
-        开始时间
+        开始时间:
         <label class="layui-inline">
             <input type="date" name="start_time" class="layui-input" autocomplete="off">
         </label>
@@ -27,16 +27,44 @@
 
         &ensp;
         &ensp;
-        结束时间
+        结束时间:
         <label class="layui-inline">
             <input type="date" name="end_time" class="layui-input" autocomplete="off">
         </label>
+        &ensp;
+        &ensp;
+
+        &ensp;
+        客户名:
+        <label class="layui-inline">
+            <input type="text" name="customer" list="customers" class="layui-input">
+        </label>
+        <!-- 使用style="display:none;"将datalist元素设定为不显示 -->
+        <datalist id="customers" style="display:none; ">
+            {% for customer_name in all_customer_name %}
+                <option name='customer'>{{ customer_name.customer }}</option>
+            {% endfor %}
+        </datalist>
+        &ensp;
+        &ensp;
+
+        &ensp;
+        产品名:
+        <label class="layui-inline">
+            <input type="text" name="product" list="products" class="layui-input">
+        </label>
+        <!-- 使用style="display:none;"将datalist元素设定为不显示 -->
+        <datalist id="products" style="display:none; ">
+            {% for product in all_product_name %}
+                <option name='product'>{{ product.product }}</option>
+            {% endfor %}
+        </datalist>
         <button type="submit" class="layui-btn layui-btn-primary" lay-submit><i
                 class="layui-icon"></i> 搜 索
         </button>
         <label class="layui-inline">
-            <input type="text" name="saleman" class="layui-input" autocomplete="off" value="{{ aii_info.0.saleman }}"
-                   style="width: 150px;height: 40px;margin-left:650%">
+            <input type="text" name="saleman" class="layui-input" autocomplete="off" value="{{ all_info.0.saleman }}"
+                   style="width: 150px;height: 40px;margin-left:280%">
         </label>
 
     </div>
@@ -55,30 +83,28 @@
             , totalRow: true
             , cols: [[ //标题栏
                 {field: 'id', title: 'ID', maxWidth: 50, sort: true, totalRowText: '合计'}
-                , {field: 'date', title: '交易时间', minWidth: 150, sort: true}
-                , {field: 'bank', title: '交易行名', minWidth: 100}
-                , {field: 'banking_heads', title: '对方户名', minWidth: 250}
-                , {field: 'money', title: '收入金额', minWidth: 150, sort: true, totalRowText:{{sum_money}}}
-                , {field: 'customer', title: '客户公司名', width: 250, templet: addLink}
-                , {field: 'area', title: '区域', minWidth: 100}
-                , {field: 'remake', title: '备注', minWidth: 150}
-                , {field: 'earnest_money', title: '保证金额', minWidth: 150, sort: true}
-                , {field: 'push_money', title: '提成金额', minWidth: 150, sort: true,}
+                , {field: 'sale_date', title: '日期', minWidth: 150, sort: true}
+                , {field: 'customer', title: '客户名', minWidth: 100, templet: addLink}
+                , {field: 'product', title: '产品名', minWidth: 250}
+                , {field: 'product_number', title: '数量', minWidth: 150, sort: true, }
+                , {field: 'product_price', title: '单价', width: 250,}
+                , {field: 'sale_money', title: '总价', minWidth: 100,totalRowText: {{sum_money|safe}}}
+                , {field: 'area', title: '地区', minWidth: 150}
+                , {field: 'remake', title: '备注', minWidth: 150, sort: true}
                 , {field: 'right', title: '操作', toolbar: '#saleman_tool', width: 150}
             ]],
             data: [
-                {% for foo in aii_info %}
+                {% for foo in all_info %}
                     {
                         "id": "{{foo.id  }}"
-                        , "date": "{{foo.date |date:'Y-m-d h:m:s' |safe }}"
-                        , "bank": "{{foo.bank}}"
-                        , "banking_heads": "{{foo.banking_heads}}"
-                        , "money": "{{foo.money}}"
-                        , "customer": "{{ foo.customer }}"
+                        , "sale_date": "{{foo.sale_date |date:'Y-m-d ' |safe }}"
+                        , "customer": "{{foo.customer}}"
+                        , "product": "{{foo.product}}"
+                        , "product_number": "{{foo.product_number}}"
+                        , "product_price": "{{ foo.product_price }}"
+                        , "sale_money": "{{ foo.sale_money }}"
                         , "area": "{{ foo.area }}"
                         , "remake": "{{ foo.remake }}"
-                        , "earnest_money": "{{ foo.earnest_money }}"
-                        , "push_money": "{{ foo.push_money }}"
                     },
                 {% endfor %}
             ],
@@ -91,7 +117,7 @@
             if (obj.event === 'delete') {
                 layer.confirm('真的删除行么', function (index) {
                     $.ajax({
-                        url: "/delete_receivable_info/",
+                        url: "/delete_sale_money_info/",
                         type: "POST",
                         data: {id: data.id},
                         success: function (msg) {
@@ -120,7 +146,7 @@
                     shade: false,
                     maxmin: true, //开启最大化最小化按钮
                     area: ['80%', '80%'],
-                    content: '/edit_receivable_info/?id=' + data.id
+                    content: '/edit_sale_money_info/?id=' + data.id
                 });
             }
         });

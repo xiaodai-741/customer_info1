@@ -28,7 +28,9 @@
                 <option name='territory'>{{ cus.territory }}</option>
             {% endfor %}
         </datalist>
-        <button type="submit" class="layui-btn">搜索
+        <button type="submit" class="layui-btn layui-btn-primary" lay-submit><i
+                class="layui-icon"></i> 搜 索
+        </button>
         </button>
     </div>
 </form>
@@ -111,7 +113,6 @@
 <script>
     function addLink(d) {
         var addLink = d.name;
-        var href_link = '/saleman_welcome/?saleman_id =' + d.name
         if ('' === addLink || null == addLink) {
             return '';
         }

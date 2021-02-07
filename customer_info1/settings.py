@@ -26,7 +26,7 @@ SECRET_KEY = '+zypx1^$k3(nemu2$cr***!b&g3iu^m2$0lm$=1b&c4a50)!ph'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '192.168.3.130']
+ALLOWED_HOSTS = ['127.0.0.1', '192.168.3.138']
 
 # Application definition
 

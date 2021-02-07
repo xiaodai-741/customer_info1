@@ -89,7 +89,9 @@
             {% endfor %}
         </datalist>
 
-        <button type="submit" style="font-size:large ; margin-top: 20px" class="layui-btn">搜索</button>
+        <button type="submit" class="layui-btn layui-btn-primary" lay-submit><i
+                class="layui-icon"></i> 搜 索
+        </button>
     </div>
 </form>
 <div>
@@ -107,8 +109,8 @@
             , toolbar: '#toolbarDemo'
             , cols: [[ //标题栏
                 {field: 'customer_id', title: 'ID', width: 80, sort: true}
-                , {field: 'customer_name', title: '客户公司名称', width: 120}
-                , {field: 'saleman_name', title: '业务员', minWidth: 150}
+                , {field: 'customer_name', title: '客户公司名称', width: 120, templet: customer_addLink}
+                , {field: 'saleman_name', title: '业务员', minWidth: 150, templet: addLink}
                 , {field: 'area', title: '所属区域', minWidth: 150}
                 , {field: 'area_responsible', title: '负责区域', minWidth: 150}
                 , {field: 'customer_lever', title: '经销商级别', minWidth: 150}
@@ -190,5 +192,27 @@
         <button class="layui-btn layui-btn-sm" lay-event="edit">编辑</button>
         <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete">删除</button>
     </div>
+</script>
+<script>
+    function customer_addLink(d) {
+        var addLink = d.customer_name;
+        if ('' === addLink || null == addLink) {
+            return '';
+        }
+        if (addLink.length > 0) {
+            return "<a class='layui-table-link' href='/customer_welcome/?customer_name=" + d.customer_name + "' lay-event='link'>" + d.customer_name + '</a>';
+        }
+    }
+</script>
+<script>
+    function addLink(d) {
+        var addLink = d.saleman_name;
+        if ('' === addLink || null == addLink) {
+            return '';
+        }
+        if (addLink.length > 0) {
+            return "<a class='layui-table-link' href='/saleman_welcome/?saleman_name=" + d.saleman_name + "' lay-event='link'>" + d.saleman_name + '</a>';
+        }
+    }
 </script>
 </html>
