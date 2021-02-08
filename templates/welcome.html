@@ -354,13 +354,21 @@
                 source: [
                     ['时间',
                         {% for month in month_list %}
-                                '{{ month }}',
+                            '{{ month }}',
                         {% endfor %}
                     ],
-                    ['差旅费', 41.1, 30.4, 65.1, 53.3, 83.8, 98.7,],
-                    ['样品费', 86.5, 92.1, 85.7, 83.1, 73.4, 55.1],
-                    ['核销费', 24.1, 67.2, 79.5, 86.4, 65.2, 82.5],
-                    ['品鉴费', 55.2, 67.1, 69.2, 72.4, 53.9, 39.1]
+                    ['差旅费', {% for money in six_chai_lv_cost_date %}
+                        '{{ money }}',
+                    {% endfor %}],
+                    ['样品费', {% for money in six_yang_pin_cost_date %}
+                        '{{ money }}',
+                    {% endfor %}],
+                    ['核销费', {% for money in six_he_xiao_cost_date %}
+                        '{{ money }}',
+                    {% endfor %}],
+                    ['品鉴费', {% for money in six_pin_jian_cost_date %}
+                        '{{ money }}',
+                    {% endfor %}]
                 ]
             },
             xAxis: {type: 'category'},
@@ -377,12 +385,12 @@
                     radius: '30%',
                     center: ['50%', '25%'],
                     label: {
-                        formatter: '{b}: {@{{ month_list.5 }}} ({d}%)'
+                        formatter: '{b}: {@{{ month_list.3 }}} ({d}%)'
                     },
                     encode: {
                         itemName: '时间',
-                        value: '{{ month_list.5 }}',
-                        tooltip: '{{ month_list.5 }}'
+                        value: '{{ month_list.3 }}',
+                        tooltip: '{{ month_list.3 }}'
                     }
                 }
             ]

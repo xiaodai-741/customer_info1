@@ -71,8 +71,14 @@ def welcome(request):
         yang_pin_cost_number = md.CostTable.objects.raw(yang_pin_cost_sql)
         pin_jian_cost_number = md.CostTable.objects.raw(pin_jian_cost_sql)
         he_xiao_cost_number = md.CostTable.objects.raw(he_xiao_cost_sql)
-        print(he_xiao_cost_number[0].sum_money)
-        six_he_xiao_cost_date.append(he_xiao_cost_number[0].sum_money)
+        six_he_xiao_cost_date.append(
+            0 if he_xiao_cost_number[0].sum_money is None else round(he_xiao_cost_number[0].sum_money, 2))
+        six_chai_lv_cost_date.append(
+            0 if chai_lv_cost_number[0].sum_money is None else round(chai_lv_cost_number[0].sum_money, 2))
+        six_yang_pin_cost_date.append(
+            0 if yang_pin_cost_number[0].sum_money is None else round(yang_pin_cost_number[0].sum_money, 2))
+        six_pin_jian_cost_date.append(
+            0 if pin_jian_cost_number[0].sum_money is None else round(pin_jian_cost_number[0].sum_money, 2))
         try:
             sum_sale_money1 = sum_sale_money[0].sale_money
             six_sale_money_date.append(round(float(sum_sale_money1), 2))
@@ -97,13 +103,13 @@ def welcome(request):
         else:
             cost_money = 0
             six_sale_money_date.append(cost_money)
-    print(six_he_xiao_cost_date)
     before_one_month_receivable = abs(six_receivable_date[3] - six_receivable_date[2])
     before_two_month_receivable = abs(six_receivable_date[3] - six_receivable_date[1])
     before_one_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[2])
     before_two_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[1])
     before_one_month_cost_number = abs(six_cost_date[3] - six_cost_date[2])
     before_two_month_cost_number = abs(six_cost_date[3] - six_cost_date[1])
+    print(six_pin_jian_cost_date)
     return render(request, "welcome.html",
                   {'six_sale_money_date': six_sale_money_date,
                    'month_list': month_list, 'six_receivable_date': six_receivable_date,
@@ -113,8 +119,10 @@ def welcome(request):
                    'before_two_month_receivable': before_two_month_receivable,
                    'before_one_month_sale_money': before_one_month_sale_money,
                    'before_two_month_sale_money': before_two_month_sale_money,
-                   'before_one_month_cost_number': before_one_month_cost_number,
-                   'before_two_month_cost_number': round(before_two_month_cost_number, 2)})
+                   'before_one_month_cost_number': round(before_one_month_cost_number, 2),
+                   'before_two_month_cost_number': round(before_two_month_cost_number, 2),
+                   'six_he_xiao_cost_date': six_he_xiao_cost_date, 'six_chai_lv_cost_date': six_chai_lv_cost_date,
+                   'six_yang_pin_cost_date': six_yang_pin_cost_date, 'six_pin_jian_cost_date': six_pin_jian_cost_date})
 
 
 def receivable_info(request):
