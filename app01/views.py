@@ -102,7 +102,7 @@ def welcome(request):
             six_cost_date.append(round(float(cost_money), 2))
         else:
             cost_money = 0
-            six_sale_money_date.append(cost_money)
+            six_cost_date.append(cost_money)
     before_one_month_receivable = abs(six_receivable_date[3] - six_receivable_date[2])
     before_two_month_receivable = abs(six_receivable_date[3] - six_receivable_date[1])
     before_one_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[2])
@@ -548,40 +548,6 @@ def edit_customer(request):
         cursor.execute(sql)
         connection.commit()
         db.close()
-        # customer_info = md.Customer.objects.get(id=customer_id)
-        # customer_info.area = area
-        # customer_info.saleman = saleman
-        # customer_info.customer = customer
-        # customer_info.linkman = linkman
-        # customer_info.area = area
-        # customer_info.phone_number = phone_number
-        # customer_info.company_address = company_address
-        # customer_info.number_of_employee = number_of_employee
-        # customer_info.real_boss_and_phone = real_boss_and_phone
-        # customer_info.boss_birthday = boss_birthday
-        # customer_info.boss_chinese_zodiac = boss_chinese_zodiac
-        # customer_info.company_birthday = company_birthday
-        # customer_info.sale_product_all_is_qb = sale_product_all_is_qb
-        # customer_info.other_product_name = other_product_name
-        # customer_info.total_annual_sales = total_annual_sales
-        # customer_info.Products_accounted_for_qb = Products_accounted_for_qb
-        # customer_info.Products_accounted_for_chenpi = Products_accounted_for_chenpi
-        # customer_info.Products_accounted_for_ganpucha = Products_accounted_for_ganpucha
-        # customer_info.area_responsible = area_responsible
-        # customer_info.customer_level = customer_level
-        # customer_info.task_money = task_money
-        # customer_info.finish_money = finish_money
-        # customer_info.purchase_amount_of_qiyueguo = purchase_amount_of_qiyueguo
-        # customer_info.the_storage_amount_of_xinpi = the_storage_amount_of_xinpi
-        # customer_info.the_qbproduct_sales_first = the_qbproduct_sales_first
-        # customer_info.the_qbproduct_sales_second = the_qbproduct_sales_second
-        # customer_info.the_qbproduct_sales_third = the_qbproduct_sales_third
-        # customer_info.fenxiao_number_name = fenxiao_number_name
-        # customer_info.zhuangui_number_name = zhuangui_number_name
-        # customer_info.customer_specific_circumstance = customer_specific_circumstance
-        # customer_info.question = question
-        # customer_info.remark = remark
-        # customer_info.save()
 
         return HttpResponse('修改成功')
 
@@ -644,31 +610,7 @@ def add_customer(request):
         cursor.execute(sql)
         connection.commit()
         db.close()
-        # print(type(superior))
-        # customer = md.Customer.objects.create(id=customer_id, area=area, saleman=saleman, linkman=linkman,
-        #                                       customer=customer, phone_number=phone_number,
-        #                                       company_address=company_address, number_of_employee=number_of_employee,
-        #                                       real_boss_and_phone=real_boss_and_phone, boss_birthday=boss_birthday,
-        #                                       boss_chinese_zodiac=boss_chinese_zodiac,
-        #                                       company_birthday=company_birthday,
-        #                                       sale_product_all_is_qb=sale_product_all_is_qb,
-        #                                       other_product_name=other_product_name,
-        #                                       total_annual_sales=total_annual_sales,
-        #                                       Products_accounted_for_qb=Products_accounted_for_qb,
-        #                                       Products_accounted_for_chenpi=Products_accounted_for_chenpi,
-        #                                       Products_accounted_for_ganpucha=Products_accounted_for_ganpucha,
-        #                                       area_responsible=area_responsible, customer_level=customer_level,
-        #                                       task_money=task_money, finish_money=finish_money,
-        #                                       purchase_amount_of_qiyueguo=purchase_amount_of_qiyueguo,
-        #                                       the_storage_amount_of_xinpi=the_storage_amount_of_xinpi,
-        #                                       the_qbproduct_sales_first=the_qbproduct_sales_first,
-        #                                       the_qbproduct_sales_second=the_qbproduct_sales_second,
-        #                                       the_qbproduct_sales_third=the_qbproduct_sales_third,
-        #                                       fenxiao_number_name=fenxiao_number_name,
-        #                                       zhuangui_number_name=zhuangui_number_name,
-        #                                       customer_specific_circumstance=customer_specific_circumstance,
-        #                                       question=question, remark=remark)
-        # customer.save()
+
         return HttpResponse('添加成功')
 
 
@@ -678,6 +620,11 @@ def saleman_welcome(request):
     six_sale_money_date = []
     month_list = []
     six_receivable_date = []
+    six_cost_date = []
+    six_chai_lv_cost_date = []
+    six_yang_pin_cost_date = []
+    six_pin_jian_cost_date = []
+    six_he_xiao_cost_date = []
     product_date_name_list = []
     product_date_price_list = []
     product_number_list = [0, 1, 2, 3, 4]
@@ -687,11 +634,29 @@ def saleman_welcome(request):
     for i in range(6):
         sale_money_sql = f"SELECT id,sum(sale_money) sale_money FROM app01_salemansaleinfo WHERE saleman = '{saleman_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( sale_date, '%%Y%%m' ) ) =5-{i} "
         receivable_sql = f"SELECT id,sum(money) sum_money FROM app01_salemanreceivable WHERE saleman = '{saleman_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( indexdate, '%%Y%%m' ) ) =5-{i} "
+        cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and saleman  = '{saleman_name}' "
+        chai_lv_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i}  and cost_type='差旅费' and saleman = '{saleman_name}' "
+        yang_pin_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='样品费' and saleman = '{saleman_name}'"
+        pin_jian_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='品鉴费' and saleman = '{saleman_name}'"
+        he_xiao_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='核销费' and saleman = '{saleman_name}'"
         month = arrow.now().shift(months=i - 5).format("YYYY-MM")
         month_list.append(month)
         print(sale_money_sql)
         sum_sale_money = md.SalemanSaleInfo.objects.raw(sale_money_sql)
         saleman_receivable = md.SalemanSaleInfo.objects.raw(receivable_sql)
+        cost_number = md.CostTable.objects.raw(cost_sql)
+        chai_lv_cost_number = md.CostTable.objects.raw(chai_lv_cost_sql)
+        yang_pin_cost_number = md.CostTable.objects.raw(yang_pin_cost_sql)
+        pin_jian_cost_number = md.CostTable.objects.raw(pin_jian_cost_sql)
+        he_xiao_cost_number = md.CostTable.objects.raw(he_xiao_cost_sql)
+        six_he_xiao_cost_date.append(
+            0 if he_xiao_cost_number[0].sum_money is None else round(he_xiao_cost_number[0].sum_money, 2))
+        six_chai_lv_cost_date.append(
+            0 if chai_lv_cost_number[0].sum_money is None else round(chai_lv_cost_number[0].sum_money, 2))
+        six_yang_pin_cost_date.append(
+            0 if yang_pin_cost_number[0].sum_money is None else round(yang_pin_cost_number[0].sum_money, 2))
+        six_pin_jian_cost_date.append(
+            0 if pin_jian_cost_number[0].sum_money is None else round(pin_jian_cost_number[0].sum_money, 2))
         try:
             sum_sale_money1 = sum_sale_money[0].sale_money
             six_sale_money_date.append(round(float(sum_sale_money1), 2))
@@ -710,6 +675,12 @@ def saleman_welcome(request):
         except Exception:
             product_date_name_list.append('无')
             product_date_price_list.append(0)
+        if cost_number[0].sum_money is not None:
+            cost_money = cost_number[0].sum_money
+            six_cost_date.append(round(float(cost_money), 2))
+        else:
+            cost_money = 0
+            six_cost_date.append(cost_money)
     print(six_sale_money_date)
     print(six_receivable_date)
     print(month_list)
@@ -717,15 +688,21 @@ def saleman_welcome(request):
     before_two_month_receivable = abs(six_receivable_date[3] - six_receivable_date[1])
     before_one_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[2])
     before_two_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[1])
+    before_one_month_cost_number = abs(six_cost_date[3] - six_cost_date[2])
+    before_two_month_cost_number = abs(six_cost_date[3] - six_cost_date[1])
     return render(request, "saleman/saleman_welcome.html",
                   {'saleman_name': saleman_name, 'six_sale_money_date': six_sale_money_date,
                    'month_list': month_list, 'six_receivable_date': six_receivable_date,
-                   'product_date_name_list': product_date_name_list,
+                   'six_cost_date': six_cost_date, 'product_date_name_list': product_date_name_list,
                    'product_date_price_list': product_date_price_list, 'product_number_list': product_number_list,
                    'before_one_month_receivable': before_one_month_receivable,
                    'before_two_month_receivable': before_two_month_receivable,
                    'before_one_month_sale_money': before_one_month_sale_money,
-                   'before_two_month_sale_money': before_two_month_sale_money})
+                   'before_two_month_sale_money': before_two_month_sale_money,
+                   'before_one_month_cost_number': round(before_one_month_cost_number, 2),
+                   'before_two_month_cost_number': round(before_two_month_cost_number, 2),
+                   'six_he_xiao_cost_date': six_he_xiao_cost_date, 'six_chai_lv_cost_date': six_chai_lv_cost_date,
+                   'six_yang_pin_cost_date': six_yang_pin_cost_date, 'six_pin_jian_cost_date': six_pin_jian_cost_date})
 
 
 def saleman_receivable_info(request):
@@ -743,7 +720,7 @@ def saleman_receivable_info(request):
     sum_money = md.SalemanReceivableInfo.objects.raw(sum_sql)[0].sum_money
     print(sum_money)
     return render(request, 'saleman/saleman-info/saleman_receivable_info.html',
-                  {'aii_info': all_info, 'sum_money': sum_money})
+                  {'aii_info': all_info, 'sum_money': 0 if sum_money is None else sum_money})
 
 
 def delete_saleman_receivable_info(request):
@@ -840,12 +817,43 @@ def edit_saleman_sale_money_info(request):
         return HttpResponse('修改成功')
 
 
+def saleman_cost(request):
+    all_type = md.CostTable.objects.all().values('cost_type').distinct()
+    all_area = md.CostTable.objects.all().values('area').distinct()
+    all_saleman_name = md.CostTable.objects.all().values('saleman').distinct()
+    all_customer_name = md.CostTable.objects.all().values('customer').distinct()
+    all_cost_info = md.CostTable.objects.all().filter(saleman=request.session['saleman'])
+    cost_sum = md.CostTable.objects.aggregate(sum=Sum('cost_number'))['sum']
+    if request.method == 'POST':
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        saleman = request.POST.get('saleman')
+        customer = request.POST.get('customer')
+        cost_type = request.POST.get('type')
+        area = request.POST.get('area')
+        sql = f"select * from app01_costtable where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and if(length('{customer}')=0,ISNULL(customer),customer='{customer}' ) and saleman like '%%{saleman}%%' and area like '%%{area}%%'and cost_type like '%%{cost_type}%%'"
+        money_sql = f"select id, sum(cost_number) cost_sum from app01_costtable where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and if(length('{customer}')=0,ISNULL(customer),customer='{customer}' ) and saleman like '%%{saleman}%%' and area like '%%{area}%%'and cost_type like '%%{cost_type}%%'"
+
+        all_cost_info = md.CostTable.objects.raw(sql)
+        cost_sum = md.CostTable.objects.raw(money_sql)[0].cost_sum
+        print(money_sql)
+    return render(request, 'saleman/saleman_cost.html',
+                  {'all_type': all_type, 'all_area': all_area, 'all_saleman_name': all_saleman_name,
+                   'all_customer_name': all_customer_name, 'all_cost_info': all_cost_info,
+                   'cost_sum': cost_sum})
+
+
 def customer_welcome(request):
     customer_name = request.GET.get('customer_name')
     request.session['customer_name'] = customer_name
     six_sale_money_date = []
     month_list = []
     six_receivable_date = []
+    six_cost_date = []
+    six_chai_lv_cost_date = []
+    six_yang_pin_cost_date = []
+    six_pin_jian_cost_date = []
+    six_he_xiao_cost_date = []
     product_date_name_list = []
     product_date_price_list = []
     product_number_list = [0, 1, 2, 3, 4]
@@ -855,17 +863,36 @@ def customer_welcome(request):
     for i in range(6):
         sale_money_sql = f"SELECT id,sum(sale_money) sale_money FROM app01_salemansaleinfo WHERE customer = '{customer_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( sale_date, '%%Y%%m' ) ) =5-{i} "
         receivable_sql = f"SELECT id,sum(money) sum_money FROM app01_salemanreceivableinfo WHERE customer= '{customer_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} "
+        cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and customer = '{customer_name}' "
+        chai_lv_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i}  and cost_type='差旅费' and customer = '{customer_name}' "
+        yang_pin_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='样品费' and customer = '{customer_name}'"
+        pin_jian_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='品鉴费' and customer = '{customer_name}'"
+        he_xiao_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='核销费' and customer = '{customer_name}'"
         month = arrow.now().shift(months=i - 5).format("YYYY-MM")
         month_list.append(month)
-        print(receivable_sql)
         sum_sale_money = md.SalemanSaleInfo.objects.raw(sale_money_sql)
         saleman_receivable = md.SalemanSaleInfo.objects.raw(receivable_sql)
+        cost_number = md.CostTable.objects.raw(cost_sql)
+        chai_lv_cost_number = md.CostTable.objects.raw(chai_lv_cost_sql)
+        yang_pin_cost_number = md.CostTable.objects.raw(yang_pin_cost_sql)
+        pin_jian_cost_number = md.CostTable.objects.raw(pin_jian_cost_sql)
+        he_xiao_cost_number = md.CostTable.objects.raw(he_xiao_cost_sql)
+        six_he_xiao_cost_date.append(
+            0 if he_xiao_cost_number[0].sum_money is None else round(he_xiao_cost_number[0].sum_money, 2))
+        six_chai_lv_cost_date.append(
+            0 if chai_lv_cost_number[0].sum_money is None else round(chai_lv_cost_number[0].sum_money, 2))
+        six_yang_pin_cost_date.append(
+            0 if yang_pin_cost_number[0].sum_money is None else round(yang_pin_cost_number[0].sum_money, 2))
+        six_pin_jian_cost_date.append(
+            0 if pin_jian_cost_number[0].sum_money is None else round(pin_jian_cost_number[0].sum_money, 2))
         try:
             sum_sale_money1 = sum_sale_money[0].sale_money
             six_sale_money_date.append(round(float(sum_sale_money1), 2))
         except Exception:
             sum_sale_money = 0
             six_sale_money_date.append(sum_sale_money)
+
+        print(saleman_receivable[0].sum_money)
         try:
             saleman_receivable1 = saleman_receivable[0].sum_money
             six_receivable_date.append(round(float(saleman_receivable1), 2))
@@ -878,27 +905,39 @@ def customer_welcome(request):
         except Exception:
             product_date_name_list.append('无')
             product_date_price_list.append(0)
-    print(six_sale_money_date)
+        if cost_number[0].sum_money is not None:
+            cost_money = cost_number[0].sum_money
+            six_cost_date.append(round(float(cost_money), 2))
+        else:
+            cost_money = 0
+            six_cost_date.append(cost_money)
+    print(six_cost_date)
     print(six_receivable_date)
-    print(month_list)
+    print(six_sale_money_date)
     before_one_month_receivable = abs(six_receivable_date[3] - six_receivable_date[2])
     before_two_month_receivable = abs(six_receivable_date[3] - six_receivable_date[1])
     before_one_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[2])
     before_two_month_sale_money = abs(six_sale_money_date[3] - six_sale_money_date[1])
+    before_one_month_cost_number = abs(six_cost_date[3] - six_cost_date[2])
+    before_two_month_cost_number = abs(six_cost_date[3] - six_cost_date[1])
     return render(request, "customer/customer_welcome.html",
                   {'customer_name': customer_name, 'six_sale_money_date': six_sale_money_date,
                    'month_list': month_list, 'six_receivable_date': six_receivable_date,
-                   'product_date_name_list': product_date_name_list,
+                   'six_cost_date': six_cost_date, 'product_date_name_list': product_date_name_list,
                    'product_date_price_list': product_date_price_list, 'product_number_list': product_number_list,
                    'before_one_month_receivable': before_one_month_receivable,
                    'before_two_month_receivable': before_two_month_receivable,
                    'before_one_month_sale_money': before_one_month_sale_money,
-                   'before_two_month_sale_money': before_two_month_sale_money})
+                   'before_two_month_sale_money': before_two_month_sale_money,
+                   'before_one_month_cost_number': round(before_one_month_cost_number, 2),
+                   'before_two_month_cost_number': round(before_two_month_cost_number, 2),
+                   'six_he_xiao_cost_date': six_he_xiao_cost_date, 'six_chai_lv_cost_date': six_chai_lv_cost_date,
+                   'six_yang_pin_cost_date': six_yang_pin_cost_date, 'six_pin_jian_cost_date': six_pin_jian_cost_date})
 
 
 def customer_receivable_info(request):
     customer_name = request.session['customer_name']
-    sum_sql = f"select id, sum(money) from app01_salemanreceivableinfo where customer='{customer_name}'"
+    sum_sql = f"select id, sum(money) sum_money from app01_salemanreceivableinfo where customer='{customer_name}'"
     if request.method == 'GET':
         all_info = md.SalemanReceivableInfo.objects.filter(customer=customer_name)
         # print(all_info[0].date)
@@ -906,7 +945,7 @@ def customer_receivable_info(request):
         start_time = request.POST.get('start_time')
         end_time = request.POST.get('end_time')
         sql = f"select * from app01_salemanreceivableinfo where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and customer = '{customer_name}'"
-        sum_sql = f"select  id, sum(money) from app01_salemanreceivableinfo where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and customer = '{customer_name}'"
+        sum_sql = f"select  id, sum(money) sum_money from app01_salemanreceivableinfo where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and customer = '{customer_name}'"
         all_info = md.SalemanReceivableInfo.objects.raw(sql)
     sum_money = md.SalemanReceivableInfo.objects.raw(sum_sql)[0].sum_money
     return render(request, 'customer/customer_info/customer_receivable_info.html',
@@ -951,7 +990,7 @@ def edit_customer_receivable_info(request):
 
 def customer_money_info(request):
     customer_name = request.session['customer_name']
-    sum_sql = f"select id, sum(sale_money) from app01_salemansaleinfo where customer='{customer_name}'"
+    sum_sql = f"select id, sum(sale_money) sum_money from app01_salemansaleinfo where customer='{customer_name}'"
     all_saleman_name = md.SalemanSaleInfo.objects.filter(customer=customer_name).all().values('saleman').distinct()
     all_product_name = md.SalemanSaleInfo.objects.filter(customer=customer_name).all().values('product').distinct()
     if request.method == 'GET':
@@ -962,7 +1001,7 @@ def customer_money_info(request):
         saleman = request.POST.get('saleman')
         product = request.POST.get('product')
         sql = f"select * from app01_salemansaleinfo where date (sale_date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and customer = '{customer_name}' and saleman like '%%{saleman}%%'and product like '%%{product}%%'"
-        sum_sql = f"select id, sum(sale_money) from app01_salemansaleinfo where date (sale_date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and customer = '{customer_name}' and saleman like '%%{saleman}%%'and product like '%%{product}%%'"
+        sum_sql = f"select id, sum(sale_money) sum_money from app01_salemansaleinfo where date (sale_date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and customer = '{customer_name}' and saleman like '%%{saleman}%%'and product like '%%{product}%%'"
         all_info = md.SalemanSaleInfo.objects.raw(sql)
     sum_money = md.SalemanSaleInfo.objects.raw(sum_sql)[0].sum_money
     return render(request, 'customer/customer_info/customer_money_info.html',
@@ -1002,3 +1041,29 @@ def edit_customer_sale_money_info(request):
         connection.commit()
         db.close()
         return HttpResponse('修改成功')
+
+
+def customer_cost(request):
+    all_type = md.CostTable.objects.all().values('cost_type').distinct()
+    all_area = md.CostTable.objects.all().values('area').distinct()
+    all_saleman_name = md.CostTable.objects.all().values('saleman').distinct()
+    all_customer_name = md.CostTable.objects.all().values('customer').distinct()
+    all_cost_info = md.CostTable.objects.all().filter(customer=request.session['customer_name'])
+    cost_sum = md.CostTable.objects.aggregate(sum=Sum('cost_number'))['sum']
+    if request.method == 'POST':
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        saleman = request.POST.get('saleman')
+        customer = request.POST.get('customer')
+        cost_type = request.POST.get('type')
+        area = request.POST.get('area')
+        sql = f"select * from app01_costtable where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and if(length('{customer}')=0,ISNULL(customer),customer='{customer}' ) and saleman like '%%{saleman}%%' and area like '%%{area}%%'and cost_type like '%%{cost_type}%%'"
+        money_sql = f"select id, sum(cost_number) cost_sum from app01_costtable where date (date) between if (length('{start_time}')=0 ,'2018-01-01','{start_time}' ) and if(length('{end_time}') =0,now(),'{end_time}') and if(length('{customer}')=0,ISNULL(customer),customer='{customer}' ) and saleman like '%%{saleman}%%' and area like '%%{area}%%'and cost_type like '%%{cost_type}%%'"
+
+        all_cost_info = md.CostTable.objects.raw(sql)
+        cost_sum = md.CostTable.objects.raw(money_sql)[0].cost_sum
+        print(money_sql)
+    return render(request, 'customer/customer_cost.html',
+                  {'all_type': all_type, 'all_area': all_area, 'all_saleman_name': all_saleman_name,
+                   'all_customer_name': all_customer_name, 'all_cost_info': all_cost_info,
+                   'cost_sum': cost_sum})

@@ -56,22 +56,30 @@
           ]
         },
         {
-          "title": "销售信息",
-          "href": "/sale_money_info/",
-          "icon": "fa fa-file-text",
-          "target": "_self"
-        },
-        {
-          "title": "回款信息",
-          "href": "/receivable_info/",
-          "icon": "fa fa-file-text",
-          "target": "_self"
-        },
-        {
-          "title": "费用信息",
-          "href": "/cost/",
-          "icon": "fa fa-file-text",
-          "target": "_self"
+          "title": "信息管理",
+          "href": "",
+          "icon": "fa fa-window-maximize",
+          "target": "_self",
+          "child": [
+            {
+              "title": "销售信息",
+              "href": "/sale_money_info/",
+              "icon": "fa fa-file-text",
+              "target": "_self"
+            },
+            {
+              "title": "回款信息",
+              "href": "/receivable_info/",
+              "icon": "fa fa-file-text",
+              "target": "_self"
+            },
+            {
+              "title": "费用信息",
+              "href": "/cost/",
+              "icon": "fa fa-file-text",
+              "target": "_self"
+            }
+          ]
         }
       ]
     }

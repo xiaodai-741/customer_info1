@@ -47,6 +47,7 @@ urlpatterns = [
     url('^saleman_sale_money_info/', views.saleman_sale_money_info),
     url('^delete_saleman_sale_money_info/', views.delete_saleman_sale_money_info),
     url('^edit_saleman_sale_money_info/', views.edit_saleman_sale_money_info),
+    url('^saleman_cost/', views.saleman_cost),
     url('^customer_welcome/', views.customer_welcome),
     url('^customer_receivable_info/', views.customer_receivable_info),
     url('^delete_customer_receivable_info/', views.delete_customer_receivable_info),
@@ -54,5 +55,6 @@ urlpatterns = [
     url('^customer_money_info/', views.customer_money_info),
     url('^delete_customer_sale_money_info/', views.delete_customer_sale_money_info),
     url('^edit_customer_sale_money_info/', views.edit_customer_sale_money_info),
+    url('^customer_cost/', views.customer_cost),
 
 ]

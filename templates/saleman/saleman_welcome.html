@@ -103,16 +103,32 @@
         </div>
         <div class="layui-col-xs12 layui-col-md3">
 
-            <div class="layui-card top-panel">
-                <div class="layui-card-header">费用</div>
+             <div class="layui-card top-panel">
+                <div class="layui-card-header"><a href="/saleman_cost/">费用</a></div>
                 <div class="layui-card-body">
                     <div class="layui-row layui-col-space5">
                         <div class="layui-col-xs9 layui-col-md9 top-panel-number">
-                            9,054,056
+                            {{ six_cost_date.3 }}
                         </div>
                         <div class="layui-col-xs3 layui-col-md3 top-panel-tips">
-                            比昨天 <a style="color: #1aa094">▲0.12</a><br>
-                            比七日 <a style="color: #bd3004">▼0.06</a>
+                            比上月
+                            {% if six_cost_date.3 >= six_cost_date.2 %}
+                                <a style="color: #1aa094">
+                                    ▲{{ before_one_month_cost_number }} </a>
+                            {% else %}
+                                <a style="color: #bd3004">
+                                    ▼{{ before_one_month_cost_number }}</a>
+                            {% endif %}
+                            <br>
+                            比上上月
+
+                            {% if six_cost_date.3 >= six_cost_date.1 %}
+                                <a style="color: #1aa094">
+                                    ▲{{ before_two_month_cost_number }}</a>
+                            {% else %}
+                                <a style="color: #bd3004">
+                                    ▼{{ before_two_month_cost_number }}</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -123,23 +139,6 @@
 
             <div class="layui-card top-panel">
                 <div class="layui-card-header">当月新开客户</div>
-                <div class="layui-card-body">
-                    <div class="layui-row layui-col-space5">
-                        <div class="layui-col-xs9 layui-col-md9 top-panel-number">
-                            9,054,056
-                        </div>
-                        <div class="layui-col-xs3 layui-col-md3 top-panel-tips">
-                            比昨天 <a style="color: #1aa094">▲0.12</a><br>
-                            比七日 <a style="color: #bd3004">▼0.06</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="layui-col-xs12 layui-col-md3">
-
-            <div class="layui-card top-panel">
-                <div class="layui-card-header">当月提成</div>
                 <div class="layui-card-body">
                     <div class="layui-row layui-col-space5">
                         <div class="layui-col-xs9 layui-col-md9 top-panel-number">
@@ -251,7 +250,7 @@
                     type: 'line',
                     stack: '总量',
                     areaStyle: {},
-                    data: [820, 932, 901, 20000, 1290, 1330, 1320]
+                    data: {{ six_cost_date }}
                 },
                 {
                     name: '销售额',
@@ -361,7 +360,7 @@
         var echartsMap = echarts.init(document.getElementById('echarts-map'), 'walden');
 
 
-        var optionMap = {
+         var optionMap = {
             legend: {},
             tooltip: {
                 trigger: 'axis',
@@ -369,11 +368,23 @@
             },
             dataset: {
                 source: [
-                    ['product', '一月', '二月', '三月', '四月', '五月', '六月'],
-                    ['Matcha Latte', 41.1, 30.4, 65.1, 53.3, 83.8, 98.7],
-                    ['Milk Tea', 86.5, 92.1, 85.7, 83.1, 73.4, 55.1],
-                    ['Cheese Cocoa', 24.1, 67.2, 79.5, 86.4, 65.2, 82.5],
-                    ['Walnut Brownie', 55.2, 67.1, 69.2, 72.4, 53.9, 39.1]
+                    ['时间',
+                        {% for month in month_list %}
+                            '{{ month }}',
+                        {% endfor %}
+                    ],
+                    ['差旅费', {% for money in six_chai_lv_cost_date %}
+                        '{{ money }}',
+                    {% endfor %}],
+                    ['样品费', {% for money in six_yang_pin_cost_date %}
+                        '{{ money }}',
+                    {% endfor %}],
+                    ['核销费', {% for money in six_he_xiao_cost_date %}
+                        '{{ money }}',
+                    {% endfor %}],
+                    ['品鉴费', {% for money in six_pin_jian_cost_date %}
+                        '{{ money }}',
+                    {% endfor %}]
                 ]
             },
             xAxis: {type: 'category'},
@@ -390,12 +401,12 @@
                     radius: '30%',
                     center: ['50%', '25%'],
                     label: {
-                        formatter: '{b}: {@一月} ({d}%)'
+                        formatter: '{b}: {@{{ month_list.3 }}} ({d}%)'
                     },
                     encode: {
-                        itemName: 'product',
-                        value: '一月',
-                        tooltip: '一月'
+                        itemName: '时间',
+                        value: '{{ month_list.3 }}',
+                        tooltip: '{{ month_list.3 }}'
                     }
                 }
             ]
