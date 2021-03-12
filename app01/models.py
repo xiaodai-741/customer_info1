@@ -79,6 +79,8 @@ class SalemanSaleInfo(models.Model):
     saleman = models.CharField(max_length=255, null=True)
     area = models.CharField(max_length=255, null=True)
     remake = models.CharField(max_length=255, null=True)
+    abstract = models.CharField(max_length=255, null=True)
+    order_number = models.CharField(max_length=255, null=True)
 
 
 class SalemanReceivableInfo(models.Model):

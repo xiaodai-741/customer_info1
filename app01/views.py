@@ -18,21 +18,22 @@ def login(request):
 
 def user_judge(request):
     if request.method == 'POST':
-        print(request.method)
         user = request.POST.get('username')
         pwd = request.POST.get('password')
-        print(user, pwd)
+        captcha = request.POST.get('captcha')
+
         if md.User.objects.filter(name=user, password=pwd):
             request.session['user'] = user
             request.session['pwd'] = pwd
             # return redirect('/customer_list/')
             print('用户登陆成功')
         else:
-            if md.Manage.objects.filter(name=user, password=pwd):
-                print('管理员登陆成功')
+            if md.Manage.objects.filter(name=user, password=pwd) and captcha == 'xszg':
                 return redirect('/manage_index/')
+            elif captcha != 'xszg':
+                win32api.MessageBox(0, "验证码错误！！！", "登陆失败", win32con.MB_OK)
+                return render(request, 'login.html')
             else:
-                print(1)
                 win32api.MessageBox(0, "账号或密码错误！！！", "登陆失败", win32con.MB_OK)
                 return render(request, 'login.html')
     print(request.method)
@@ -55,7 +56,7 @@ def welcome(request):
     product_date = md.SalemanSaleInfo.objects.raw(product_sql)
     for i in range(6):
         sale_money_sql = f"SELECT id,sum(sale_money) sale_money FROM app01_salemansaleinfo WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( sale_date, '%%Y%%m' ) ) =5-{i} "
-        receivable_sql = f"SELECT id,sum(money) sum_money FROM app01_salemanreceivable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( indexdate, '%%Y%%m' ) ) =5-{i} "
+        receivable_sql = f"SELECT id,sum(money) sum_money FROM app01_salemanreceivableinfo WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} "
         cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} "
         chai_lv_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i}  and cost_type='差旅费'"
         yang_pin_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='样品费'"
@@ -87,7 +88,7 @@ def welcome(request):
             six_sale_money_date.append(sum_sale_money)
         try:
             saleman_receivable1 = saleman_receivable[0].sum_money
-            six_receivable_date.append(round(float(saleman_receivable1), 2))
+            six_receivable_date.append(round(saleman_receivable1, 2))
         except Exception:
             saleman_receivable = 0
             six_receivable_date.append(saleman_receivable)
@@ -115,10 +116,10 @@ def welcome(request):
                    'month_list': month_list, 'six_receivable_date': six_receivable_date,
                    'six_cost_date': six_cost_date, 'product_date_name_list': product_date_name_list,
                    'product_date_price_list': product_date_price_list, 'product_number_list': product_number_list,
-                   'before_one_month_receivable': before_one_month_receivable,
-                   'before_two_month_receivable': before_two_month_receivable,
-                   'before_one_month_sale_money': before_one_month_sale_money,
-                   'before_two_month_sale_money': before_two_month_sale_money,
+                   'before_one_month_receivable': round(before_one_month_receivable, 2),
+                   'before_two_month_receivable': round(before_two_month_receivable, 2),
+                   'before_one_month_sale_money': round(before_one_month_sale_money, 2),
+                   'before_two_month_sale_money': round(before_two_month_sale_money, 2),
                    'before_one_month_cost_number': round(before_one_month_cost_number, 2),
                    'before_two_month_cost_number': round(before_two_month_cost_number, 2),
                    'six_he_xiao_cost_date': six_he_xiao_cost_date, 'six_chai_lv_cost_date': six_chai_lv_cost_date,
@@ -633,7 +634,7 @@ def saleman_welcome(request):
     product_date = md.SalemanSaleInfo.objects.raw(product_sql)
     for i in range(6):
         sale_money_sql = f"SELECT id,sum(sale_money) sale_money FROM app01_salemansaleinfo WHERE saleman = '{saleman_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( sale_date, '%%Y%%m' ) ) =5-{i} "
-        receivable_sql = f"SELECT id,sum(money) sum_money FROM app01_salemanreceivable WHERE saleman = '{saleman_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( indexdate, '%%Y%%m' ) ) =5-{i} "
+        receivable_sql = f"SELECT id,sum(money) sum_money FROM app01_salemanreceivableinfo WHERE saleman = '{saleman_name}' and PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} "
         cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and saleman  = '{saleman_name}' "
         chai_lv_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i}  and cost_type='差旅费' and saleman = '{saleman_name}' "
         yang_pin_cost_sql = f"SELECT id,sum(cost_number) sum_money FROM app01_costtable WHERE  PERIOD_DIFF( date_format( now( ) , '%%Y%%m' ) , date_format( date, '%%Y%%m' ) ) =5-{i} and cost_type='样品费' and saleman = '{saleman_name}'"
@@ -695,10 +696,10 @@ def saleman_welcome(request):
                    'month_list': month_list, 'six_receivable_date': six_receivable_date,
                    'six_cost_date': six_cost_date, 'product_date_name_list': product_date_name_list,
                    'product_date_price_list': product_date_price_list, 'product_number_list': product_number_list,
-                   'before_one_month_receivable': before_one_month_receivable,
-                   'before_two_month_receivable': before_two_month_receivable,
-                   'before_one_month_sale_money': before_one_month_sale_money,
-                   'before_two_month_sale_money': before_two_month_sale_money,
+                   'before_one_month_receivable': round(before_one_month_receivable, 2),
+                   'before_two_month_receivable': round(before_two_month_receivable, 2),
+                   'before_one_month_sale_money': round(before_one_month_sale_money, 2),
+                   'before_two_month_sale_money': round(before_two_month_sale_money, 2),
                    'before_one_month_cost_number': round(before_one_month_cost_number, 2),
                    'before_two_month_cost_number': round(before_two_month_cost_number, 2),
                    'six_he_xiao_cost_date': six_he_xiao_cost_date, 'six_chai_lv_cost_date': six_chai_lv_cost_date,
@@ -925,10 +926,10 @@ def customer_welcome(request):
                    'month_list': month_list, 'six_receivable_date': six_receivable_date,
                    'six_cost_date': six_cost_date, 'product_date_name_list': product_date_name_list,
                    'product_date_price_list': product_date_price_list, 'product_number_list': product_number_list,
-                   'before_one_month_receivable': before_one_month_receivable,
-                   'before_two_month_receivable': before_two_month_receivable,
-                   'before_one_month_sale_money': before_one_month_sale_money,
-                   'before_two_month_sale_money': before_two_month_sale_money,
+                   'before_one_month_receivable': round(before_one_month_receivable, 2),
+                   'before_two_month_receivable': round(before_two_month_receivable, 2),
+                   'before_one_month_sale_money': round(before_one_month_sale_money, 2),
+                   'before_two_month_sale_money': round(before_two_month_sale_money, 2),
                    'before_one_month_cost_number': round(before_one_month_cost_number, 2),
                    'before_two_month_cost_number': round(before_two_month_cost_number, 2),
                    'six_he_xiao_cost_date': six_he_xiao_cost_date, 'six_chai_lv_cost_date': six_chai_lv_cost_date,

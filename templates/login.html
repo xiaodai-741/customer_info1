@@ -108,7 +108,6 @@
         }
 
         .captcha-img img {
-            height: 34px;
             border: 1px solid #e6e6e6;
             height: 36px;
             width: 100%;
@@ -125,7 +124,7 @@
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-username" for="username"></label>
-                    <input type="text" name="username" lay-verify="required|account" placeholder="用户名或者邮箱"
+                    <input type="text" name="username" lay-verify="required|account" placeholder="用户名"
                            autocomplete="off" class="layui-input" value="">
                 </div>
                 <div class="layui-form-item">
@@ -163,7 +162,7 @@
             layer = layui.layer;
 
         // 登录过期的时候，跳出ifram框架
-        if (top.location != self.location) top.location = self.location;
+        if (top.location !== self.location) top.location = self.location;
 
         // 粒子线条背景
         $(document).ready(function () {
